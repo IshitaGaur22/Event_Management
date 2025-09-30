@@ -1,4 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using EventManagement.Data;
+using Event_Management.Repository;
+using Event_Management.Services;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<EventServiceContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Event_ManagementContext") ?? throw new InvalidOperationException("Connection string 'Event_ManagementContext' not found.")));
 
 // Add services to the container.
 
@@ -6,6 +13,12 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+/*ilder.Services.AddDbContext<EventServiceContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("StudentServiceContext")));*/
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IEventService, EventService>();
+//builder.Services.AddScoped<ExceptionHandlerAttribute>();
 
 var app = builder.Build();
 
