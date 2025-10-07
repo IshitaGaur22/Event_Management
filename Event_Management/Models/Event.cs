@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Drawing;
 
 namespace Event_Management.Models
 {
@@ -29,9 +30,13 @@ namespace Event_Management.Models
         public string Location { get; set; }
 
         //[Required]
-        //[ForeignKey(nameof(Category))]
-        public int CategoryID { get; set; }
+        //public Image img { get; set; }
 
-        //public Category Category { get; set; }
+        //[Required]
+        //[ForeignKey(nameof(Category))]
+        //public int CategoryID { get; set; }
+
+        public Category Category { get; set; }
+        public ICollection<Ticket> Tickets { get; set; }
     }
 }
