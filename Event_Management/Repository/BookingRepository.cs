@@ -49,7 +49,10 @@ namespace Event_Management.Repository
             _context.SaveChanges();
         }
 
-
+        public User GetUserByUsername(string username)
+        {
+            return _context.User.FirstOrDefault(u => u.UserName == username);
+        }
 
     }
 }
