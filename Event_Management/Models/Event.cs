@@ -3,35 +3,46 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Event_Management.Models
 {
-    public class Event
+   
+        public class Event
+        {
+        
+            [Key]
+            public int EventID { get; set; }
+
+            [Required(ErrorMessage = "Event name must be at least 3 characters.")]
+            [MinLength(3)]
+            public string EventName { get; set; }
+
+            public string Description { get; set; }
+
+            [Required(ErrorMessage = "Please enter a valid date.")]
+            public DateOnly EventDate { get; set; }
+
+            [Required(ErrorMessage = "Please enter a valid time.")]
+            public TimeOnly EventTime { get; set; }
+
+            [Required(ErrorMessage = "Location is required.")]
+            public string Location { get; set; }
+
+            //[Required(ErrorMessage ="Please Choose a category.")]
+            //public int CategoryID { get; set; }
+            public Category Category { get; set; }
+            public ICollection<Ticket> Tickets { get; set; }
+
+
+
+    }
+
+    public class FutureDateAttribute : ValidationAttribute
     {
-        [Key]
-        public int EventID { get; set; }
-
-        [Required]
-        [MaxLength(20)]
-        public string EventName { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        public string EventDescription { get; set; }
-
-        [Required]
-        [DataType(DataType.Date)]
-        public DateTime EventDate { get; set; }
-
-        [Required]
-        [DataType(DataType.Time)]
-        public TimeOnly Time { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        public string Location { get; set; }
-
-        //[Required]
-        //[ForeignKey(nameof(Category))]
-        public int CategoryID { get; set; }
-
-        //public Category Category { get; set; }
+        public override bool IsValid(object value)
+        {
+            if (value is DateTime dt)
+            {
+                return dt > DateTime.Now;
+            }
+            return false;
+        }
     }
 }
