@@ -19,10 +19,10 @@ namespace Event_Management.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal PricePerTicket { get; set; }
 
-        //[ForeignKey(nameof(User))]
-        //public int UserId { get; set; }
+        [ForeignKey(nameof(User))]
+        public int UserId { get; set; }
 
-        //public Event Event { get; set; }
+        public Event Event { get; set; }
         public User User { get; set; }
     }
 } 
