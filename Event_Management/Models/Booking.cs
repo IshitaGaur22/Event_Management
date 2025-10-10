@@ -24,6 +24,9 @@ namespace Event_Management.Models
         [Required]
         public DateTime BookingDate { get; set; }
 
+        [Required]
+        public string Status { get; set; } = "Pending"; // Default before payment
+
         public virtual Ticket Ticket { get; set; }
         public virtual Event Event { get; set; }
         public virtual User User { get; set; }

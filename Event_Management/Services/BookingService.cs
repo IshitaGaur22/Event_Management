@@ -30,7 +30,8 @@ namespace Event_Management.Services
                 EventId = ticket.EventId,
                 //UserId = 1, 
                 SelectedSeats = selectedSeats,
-                BookingDate = DateTime.Now
+                BookingDate = DateTime.Now,
+                Status = "Pending"
             };
 
             ticket.TotalSeats -= selectedSeats;
@@ -42,6 +43,11 @@ namespace Event_Management.Services
         public Booking GetBookingById(int id)
         {
             return _bookingRepository.GetBookingById(id);
+        }
+
+        public void UpdateBooking(Booking booking)
+        {
+            _bookingRepository.UpdateBooking(booking);
         }
     }
 }

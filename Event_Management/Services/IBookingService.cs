@@ -8,5 +8,7 @@ namespace Event_Management.Services
         IEnumerable<Booking> GetAllBookings();
         Booking GetBookingById(int id);
         int AddBooking(int selectedSeats);
+
+        void UpdateBooking(Booking booking);
     }
 }

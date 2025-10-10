@@ -49,6 +49,12 @@ namespace Event_Management.Repository
             _context.SaveChanges();
         }
 
+        public void UpdateBooking(Booking booking)
+        {
+            _context.Booking.Update(booking);
+            _context.SaveChanges();
+        }
+
 
 
     }
