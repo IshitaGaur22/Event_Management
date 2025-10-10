@@ -12,25 +12,29 @@ The Event Management System is a full-featured platform designed to simplify the
 - User profile with booking history, payment records, and settings.
 
 ## 🛠️ Technologies Used
-- **Frontend:** HTML, CSS, JavaScript (based on wireframes from Visily, MockFlow, Figma)
-- **Backend:** Python (Flask or Django)
-- **Database:** MySQL / PostgreSQL
+- **Frontend:** HTML, CSS, JavaScript, React.js
+- **Backend:** C#, .NET(Web API)
+- **Database:** MySQL
 - **Payment Integration:** Razorpay / Stripe API
 - **Version Control:** Git & GitHub
 
 ## 🧩 Setup Instructions
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/event-management-system.git
-   cd event-management-system
+   git clone https://github.com/IshitaGaur22/Event-Management.git
 
 ## 👥 Contributors
 
-Ishita Gaur – Ticket Booking, Event Details, Booking Flow
-Swathi Kancharla – Event Management Dashboard
-Mousoomi Shit – Feedback Module
-Akhila Sivayogi – Login & Registration
-BhavyaSree Umitti – Payment Integration, Notifications, History
+Ishita Gaur – Ticket Booking, Event Details, Booking Flow   
+
+Swathi Kancharla – Event Management Dashboard     
+
+Mousoomi Shit – Feedback Module     
+
+Akhila Sivayogi – Login & Registration    
+
+BhavyaSree Umitti – Payment Integration, Notifications, History   
+
 
 
 **This project is developed as part of a collaborative learning initiative. Contributions and improvements are welcome!**
