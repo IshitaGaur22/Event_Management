@@ -21,14 +21,22 @@ namespace Event_Management.Controllers
             _service = service;
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllTickets()
+        {
+            var tickets = await _ticketService.GetAllTicketsAsync();
+            return Ok(tickets);
+        }
+
         [HttpGet("{id}")]
         public IActionResult GetTicketById(int id)
         {
             try
             {
                 var ticket = _service.GetTicketById(id);
-                return Ok(ticket);
-            }
+            return Ok(ticket);
+        }
             catch (TicketNotFoundException ex)
             {
                 return NotFound(new { error = ex.Message });
@@ -89,6 +97,70 @@ namespace Event_Management.Controllers
             }
         }
 
-        
+        //    return ticket;
+        //}
+
+        //// PUT: api/Tickets/5
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutTicket(int id, Ticket ticket)
+        //{
+        //    if (id != ticket.TicketId)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    _context.Entry(ticket).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!TicketExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return NoContent();
+        //}
+
+        //// POST: api/Tickets
+        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        //[HttpPost]
+        //public async Task<ActionResult<Ticket>> PostTicket(Ticket ticket)
+        //{
+        //    _context.Ticket.Add(ticket);
+        //    await _context.SaveChangesAsync();
+
+        //    return CreatedAtAction("GetTicket", new { id = ticket.TicketId }, ticket);
+        //}
+
+        //// DELETE: api/Tickets/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteTicket(int id)
+        //{
+        //    var ticket = await _context.Ticket.FindAsync(id);
+        //    if (ticket == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    _context.Ticket.Remove(ticket);
+        //    await _context.SaveChangesAsync();
+
+        //    return NoContent();
+        //}
+
+        //private bool TicketExists(int id)
+        //{
+        //    return _context.Ticket.Any(e => e.TicketId == id);
+        //}
     }
 }

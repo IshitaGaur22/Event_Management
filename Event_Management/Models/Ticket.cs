@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Event_Management.Models
@@ -8,6 +9,9 @@ namespace Event_Management.Models
         [Key]
         public int TicketID { get; set; }
         
+        [Required]
+        [ForeignKey(nameof(Event))]
+        public int EventId { get; set; }
         [Required]
         public int TotalSeats { get; set; }
 
@@ -20,4 +24,4 @@ namespace Event_Management.Models
 
         //public Event Event { get; set; }
     }
-}
+} 

@@ -1,6 +1,8 @@
 ﻿using Event_Management.Data;
 using Event_Management.Exceptions;
 using Event_Management.Models;
+using EventManagement.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Event_Management.Repository
 {
@@ -48,6 +50,14 @@ namespace Event_Management.Repository
             context.SaveChanges();
         }
 
+        Task ITicketRepository.SaveChangesAsync()
+        {
+            throw new NotImplementedException();
+        }
 
+        Task ITicketRepository.UpdateTicketAsync(Ticket ticket)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

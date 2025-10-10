@@ -8,7 +8,7 @@ namespace Event_Management.Repository
         public Ticket GetTicketById(int ticketId);
         public IEnumerable<Ticket> GetAllTickets();
         public void UpdateTicketDetails(Ticket ticket);
-        
+
         public void DeleteTicket(int ticketId);
 
     }

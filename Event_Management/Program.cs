@@ -2,6 +2,7 @@
 using Event_Management.Repository;
 using Event_Management.Services;
 using Event_Management.ExceptionHandlers;
+using Event_Management.ExceptionHandlers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
