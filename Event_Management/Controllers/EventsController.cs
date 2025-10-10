@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Event_Management.Data;
+using Event_Management.Exceptions;
+using Event_Management.Models;
+using Event_Management.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Event_Management.Models;
-using Event_Management.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Event_Management.Controllers
 {
@@ -14,124 +16,137 @@ namespace Event_Management.Controllers
     [ApiController]
     public class EventsController : ControllerBase
     {
-        private readonly IEventService _eventService;
+        private readonly IEventService service;
+
         public EventsController(IEventService eventService)
         {
-            _eventService = eventService;
+            service = eventService;
         }
-        [HttpGet]
-        public IActionResult GetAllEvents()
-        {
-            return Ok(_eventService.GetAllEvents());
-        }
-
         [HttpPost]
-        public ActionResult PostEvent(Event e)
+        public IActionResult CreateEvent(Event events)
         {
-            return StatusCode(201, _eventService.AddEvent(e));
+            if (!ModelState.IsValid)
+                return BadRequest(new { error = "Invalid model state.", details = ModelState });
+            if(events==null)
+                return BadRequest("No values entered, please enter values.");
+            
+
+            try
+            {
+                service.CreateEvent(events);
+                return StatusCode(201, new { message = "Event created successfully." }); 
+            }
+            catch (EventAlreadyExistsException ex)
+            {
+                return Conflict(new { error = ex.Message });
+            }
+            catch (EventCreationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+//        try
+//            {
+//                service.UpdateEventName(id, newName);
+//                return Ok("Event name updated successfully.");
+//    }
+//            catch(EventUpdateException ex)
+//            {
+//                throw new EventUpdateException(newName);
+//}
+
+        [HttpPut("update-name")]
+        public IActionResult UpdateEventName([FromQuery] int id, [FromQuery] string newName)
+        {
+            if (string.IsNullOrWhiteSpace(newName))
+                return BadRequest("You didn't enter new event name. Please enter it");
+
+            service.UpdateEventName(id, newName);
+            return Ok("Event name updated successfully.");
         }
 
-        [HttpDelete]
-        public IActionResult DeleteEvent(int id)
+        [HttpPut("update-description")]
+        public IActionResult UpdateEventDescription([FromQuery]int id,[FromQuery] string description)
         {
-            return Ok(_eventService.DeleteEvent(id));
+            if (string.IsNullOrWhiteSpace(description))
+                return BadRequest("You didn't enter new event description. Please enter it");
+            service.UpdateEventDescription(id, description);
+            return Ok("Event description updated successfully.");
         }
 
-        [HttpPut]
-        public IActionResult PutEvent(int id, Event e)
+
+        [HttpPut("update-date")]
+        public IActionResult UpdateEventDate([FromQuery] int id, [FromQuery] DateOnly date)
         {
-            return Ok(_eventService.UpdateEvent(id, e));
+            if (string.IsNullOrEmpty(date.ToString()))
+                return BadRequest("You didn't enter new event date. Please enter it");
 
+            service.UpdateEventDate(id, date);
+            return Ok("Event date updated successfully.");
         }
-        //private readonly EventServiceContext _context;
 
-        //public EventsController(Event_ManagementContext context)
-        //{
-        //    _context = context;
-        //}
+        [HttpPut("update-time")]
+        public IActionResult UpdateEventTime([FromQuery] int id, [FromQuery] TimeOnly time)
+        {
+            if (string.IsNullOrWhiteSpace(time.ToString()))
+                return BadRequest("You didn't enter new event time. Please enter it");
 
-        //// GET: api/Events
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<Event>>> GetEvent()
-        //{
-        //    return await _context.Event.ToListAsync();
-        //}
+            service.UpdateEventTime(id, time);
+            return Ok("Event time updated successfully.");
+        }
 
-        //// GET: api/Events/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Event>> GetEvent(int id)
-        //{
-        //    var @event = await _context.Event.FindAsync(id);
+        [HttpPut("update-location")]
+        public IActionResult UpdateEventLocation([FromQuery] int id, [FromQuery] string location)
+        {
+            if (string.IsNullOrWhiteSpace(location))
+                return BadRequest("You didn't enter new event location. Please enter it");
 
-        //    if (@event == null)
-        //    {
-        //        return NotFound();
-        //    }
+            service.UpdateEventLocation(id, location);
+            return Ok("Event location updated successfully.");
+        }
 
-        //    return @event;
-        //}
 
-        //// PUT: api/Events/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutEvent(int id, Event @event)
-        //{
-        //    if (id != @event.EventID)
-        //    {
-        //        return BadRequest();
-        //    }
+        [HttpGet("by-name")]
+        public IActionResult GetEvent([FromQuery] string eventName)
+        {
+            if (eventName.Length==0)
+                return BadRequest("You didn't enter new event name. Please enter it");
 
-        //    _context.Entry(@event).State = EntityState.Modified;
+            var ev = service.FetchEventName(eventName);
+            return Ok(ev);
+        }
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!EventExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
+        [HttpGet("by-location")]
+        public IActionResult GetEventByLocation([FromQuery] string location)
+        {
+            if (location.Length==0)
+                return BadRequest("You didn't enter new event location. Please enter it");
 
-        //    return NoContent();
-        //}
+            var ev = service.FetchEventLocation(location);
+            return Ok(ev);
+        }
 
-        //// POST: api/Events
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<Event>> PostEvent(Event @event)
-        //{
-        //    _context.Event.Add(@event);
-        //    await _context.SaveChangesAsync();
+        [HttpGet("by-date")]
+        public IActionResult GetEventByDate([FromQuery] DateOnly date)
+        {
+            if (date.ToString().Length == 0)
+                return BadRequest("You didn't enter new event date. Please enter it");
 
-        //    return CreatedAtAction("GetEvent", new { id = @event.EventID }, @event);
-        //}
+            var ev = service.FetchEvenDate(date);
+            return Ok(ev);
+        }
 
-        //// DELETE: api/Events/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteEvent(int id)
-        //{
-        //    var @event = await _context.Event.FindAsync(id);
-        //    if (@event == null)
-        //    {
-        //        return NotFound();
-        //    }
 
-        //    _context.Event.Remove(@event);
-        //    await _context.SaveChangesAsync();
+        [HttpDelete("eventName")]
+        public IActionResult DeleteEvent(string eventName)
+        {
+            if (eventName == null)
+                return BadRequest("You didn't enter new event name. Please enter it");
 
-        //    return NoContent();
-        //}
+            service.Delete(eventName);
+            return Ok("Availability deleted successfully.");
+        }
 
-        //private bool EventExists(int id)
-        //{
-        //    return _context.Event.Any(e => e.EventID == id);
-        //}
+
     }
 }

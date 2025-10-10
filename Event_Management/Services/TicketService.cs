@@ -1,40 +1,68 @@
-﻿using Event_Management.Models;
+﻿using Event_Management.Exceptions;
+using Event_Management.Models;
 using Event_Management.Repository;
 
 namespace Event_Management.Services
 {
+
     public class TicketService : ITicketService
     {
-        private readonly ITicketRepository _ticketRepo;
-        public TicketService(ITicketRepository ticketRepo)
+        private readonly ITicketRepository repository;
+
+        public TicketService(ITicketRepository repo)
         {
-            _ticketRepo = ticketRepo;
+            repository = repo;
+        }
+        //public int CreateTicket(Ticket tv)
+        //{
+        //    if (repository.GetTicketById(tv.TicketID) != null)
+        //        throw new TicketAlreadyExistsException(tv.TicketID); 
+
+        //    try
+        //    {
+        //        return repository.AddTicket(tv);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new TicketCreationException(ex.Message);
+        //    }
+
+        //}
+        public void UpdateTicketDetails(Ticket ticket)
+        {
+            if (repository.GetTicketById(ticket.TicketID) == null)
+                throw new TicketNotFoundException(ticket.TicketID);
+            try
+            {
+                repository.UpdateTicketDetails(ticket);
+            }
+            catch 
+            {
+                throw new TicketUpdateException(ticket.TicketID);
+            }
         }
 
-
-        public async Task<Ticket> GetTicketAsync(int ticketId)
+        public Ticket GetTicketById(int id)
         {
-            return await _ticketRepo.GetTicketByIdAsync(ticketId);
+            var ticket = repository.GetTicketById(id);
+            if (ticket == null)
+                throw new TicketNotFoundException(id);
+            return ticket;
         }
-
-        public async Task<IEnumerable<Ticket>> GetAllTicketsAsync()
+        public IEnumerable<Ticket> GetAllTickets() => repository.GetAllTickets();
+        public void DeleteTicket(int ticketId)
         {
-            return await _ticketRepo.GetAllTicketsAsync();
+            if (repository.GetTicketById(ticketId) == null)
+                throw new TicketNotFoundException(ticketId);
+            try
+        {
+                repository.DeleteTicket(ticketId);
         }
-
-        public async Task<bool> ReduceSeatsAsync(int ticketId, int quantity)
+            catch 
         {
-
-            var ticket = await _ticketRepo.GetTicketByIdAsync(ticketId);
-            if (ticket == null || quantity <= 0 || quantity > ticket.TotalSeats)
-                return false;
-
-            ticket.TotalSeats -= quantity;
-            await _ticketRepo.UpdateTicketAsync(ticket);
-            await _ticketRepo.SaveChangesAsync();
-            return true;
-
-
+                throw new TicketDeletionException(ticketId);
+            }
         }
     }
 }
+

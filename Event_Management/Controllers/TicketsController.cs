@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Event_Management.Data;
+using Event_Management.Models;
+using Event_Management.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using EventManagement.Data;
-using Event_Management.Models;
-using Event_Management.Services;
+using Event_Management.Exceptions;
+using Event_Management.ExceptionHandlers;
+
 
 namespace Event_Management.Controllers
 {
@@ -15,11 +14,11 @@ namespace Event_Management.Controllers
     [ApiController]
     public class TicketsController : ControllerBase
     {
-        private readonly ITicketService _ticketService;
+        private readonly ITicketService _service;
 
-        public TicketsController(ITicketService ticketService)
+        public TicketsController(ITicketService service)
         {
-            _ticketService = ticketService;
+            _service = service;
         }
 
 
@@ -31,39 +30,72 @@ namespace Event_Management.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetTicket(int id)
+        public IActionResult GetTicketById(int id)
         {
-            var ticket = await _ticketService.GetTicketAsync(id);
-            if (ticket == null) return NotFound();
+            try
+            {
+                var ticket = _service.GetTicketById(id);
             return Ok(ticket);
         }
-
-        [HttpPost("{id}/reduce")]
-        public async Task<IActionResult> ReduceSeats(int id, [FromQuery] int quantity)
-        {
-            var success = await _ticketService.ReduceSeatsAsync(id, quantity);
-            if (!success) return BadRequest("Not enough seats or invalid ticket.");
-            return Ok("Seats reduced successfully.");
+            catch (TicketNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
         }
 
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<Ticket>), 200)]
+        public IActionResult GetAllTickets()
+        {
+            var Ticket = _service.GetAllTickets();
+            return Ok(Ticket);
+        }
 
-        // GET: api/Tickets
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<Ticket>>> GetTicket()
-        //{
-        //    return await _context.Ticket.ToListAsync();
-        //}
+        [HttpPut("{id}")]
+        public IActionResult UpdateTicketDetails(int id, [FromBody] Ticket ticket)
+        {
+            if (id != ticket.TicketID)
+                return BadRequest(new { error = $"ticket ID mismatch. Route ID: {id}, Body ID: {ticket.TicketID}" });
 
-        //// GET: api/Tickets/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Ticket>> GetTicket(int id)
-        //{
-        //    var ticket = await _context.Ticket.FindAsync(id);
+            if (!ModelState.IsValid)
+                return BadRequest(new { error = "Invalid model state.", details = ModelState });
 
-        //    if (ticket == null)
-        //    {
-        //        return NotFound();
-        //    }
+            try
+            {
+                _service.UpdateTicketDetails(ticket); 
+                return Ok(new { message = $"ticket with ID {id} updated successfully." });
+            }
+            catch (TicketNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (TicketUpdateException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Unexpected error occurred.", details = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteTicket(int id)
+        {
+            try
+            {
+                _service.DeleteTicket(id);
+                return Ok(new { message = $"ticket with ID {id} deleted successfully." });
+            }
+            catch (TicketNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (TicketDeletionException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
 
         //    return ticket;
         //}
