@@ -7,7 +7,8 @@ namespace Event_Management.Models
     public class Ticket
     {
         [Key]
-        public int TicketId { get; set; }
+        public int TicketID { get; set; }
+        
         [Required]
         [ForeignKey(nameof(Event))]
         public int EventId { get; set; }
@@ -15,14 +16,12 @@ namespace Event_Management.Models
         public int TotalSeats { get; set; }
 
         [Required]
-        [Precision(18, 2)]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal PricePerTicket { get; set; }
+        public float PricePerTicket { get; set; }
 
-        [ForeignKey(nameof(User))]
-        public int UserId { get; set; }
 
-        public Event Event { get; set; }
-        public User User { get; set; }
+        //[Required]
+        //public int EventID { get; set; }
+
+        //public Event Event { get; set; }
     }
 } 

@@ -4,10 +4,10 @@ namespace Event_Management.Services
 {
     public interface ITicketService
     {
-
-        Task<Ticket> GetTicketAsync(int ticketId);
-        Task<IEnumerable<Ticket>> GetAllTicketsAsync();
-        Task<bool> ReduceSeatsAsync(int ticketId, int quantity);
-
+        //int CreateTicket(Ticket tv);
+        void UpdateTicketDetails(Ticket ticket);
+        Ticket GetTicketById(int id);
+        IEnumerable<Ticket> GetAllTickets();
+        void DeleteTicket(int ticketId);
     }
 }
