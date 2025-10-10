@@ -18,17 +18,20 @@ namespace Event_Management.Services
             return _bookingRepository.GetAllBookings();
         }
 
-        public int AddBooking(int selectedSeats)
+        public int AddBooking(int selectedSeats, string userName)
         {
             var ticket = _bookingRepository.GetLatestTicket();
-            if (ticket == null || selectedSeats < ticket.TotalSeats)
+            if (ticket == null || selectedSeats > ticket.TotalSeats)
                 throw new Exception("Invalid ticket or seat count.");
 
+            var user = _bookingRepository.GetUserByUsername(userName);
+            if(user == null)
+                throw new Exception("User not found.");
             var booking = new Booking
             {
                 TicketId = ticket.TicketId,
                 EventId = ticket.EventId,
-                //UserId = 1, 
+                UserId = user.UserId,
                 SelectedSeats = selectedSeats,
                 BookingDate = DateTime.Now,
                 Status = "Pending"
