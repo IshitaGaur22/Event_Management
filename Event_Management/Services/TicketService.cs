@@ -55,11 +55,11 @@ namespace Event_Management.Services
             if (repository.GetTicketById(ticketId) == null)
                 throw new TicketNotFoundException(ticketId);
             try
-            {
+        {
                 repository.DeleteTicket(ticketId);
-            }
+        }
             catch 
-            {
+        {
                 throw new TicketDeletionException(ticketId);
             }
         }
