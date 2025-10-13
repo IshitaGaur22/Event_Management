@@ -59,7 +59,8 @@ namespace Event_Management.Migrations
 
                     b.Property<string>("EventName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<TimeOnly>("EventTime")
                         .HasColumnType("time");
@@ -83,7 +84,7 @@ namespace Event_Management.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketID"));
 
-                    b.Property<int?>("EventID")
+                    b.Property<int>("EventId")
                         .HasColumnType("int");
 
                     b.Property<float>("PricePerTicket")
@@ -94,7 +95,7 @@ namespace Event_Management.Migrations
 
                     b.HasKey("TicketID");
 
-                    b.HasIndex("EventID");
+                    b.HasIndex("EventId");
 
                     b.ToTable("Ticket");
                 });
@@ -102,7 +103,7 @@ namespace Event_Management.Migrations
             modelBuilder.Entity("Event_Management.Models.Event", b =>
                 {
                     b.HasOne("Event_Management.Models.Category", "Category")
-                        .WithMany()
+                        .WithMany("Events")
                         .HasForeignKey("CategoryID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -114,7 +115,14 @@ namespace Event_Management.Migrations
                 {
                     b.HasOne("Event_Management.Models.Event", null)
                         .WithMany("Tickets")
-                        .HasForeignKey("EventID");
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Event_Management.Models.Category", b =>
+                {
+                    b.Navigation("Events");
                 });
 
             modelBuilder.Entity("Event_Management.Models.Event", b =>

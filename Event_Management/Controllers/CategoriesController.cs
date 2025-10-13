@@ -1,14 +1,8 @@
-﻿using Event_Management.Data;
-using Event_Management.Exceptions;
+﻿using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace Event_Management.Controllers
 {

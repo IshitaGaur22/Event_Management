@@ -5,14 +5,14 @@
 namespace Event_Management.Migrations
 {
     /// <inheritdoc />
-    public partial class m2 : Migration
+    public partial class AddStatus : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "UserName",
-                table: "User",
+                name: "Status",
+                table: "Booking",
                 type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "");
@@ -22,8 +22,8 @@ namespace Event_Management.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "UserName",
-                table: "User");
+                name: "Status",
+                table: "Booking");
         }
     }
 }

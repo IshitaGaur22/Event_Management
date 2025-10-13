@@ -1,7 +1,6 @@
 ﻿using Event_Management.Data;
 using Event_Management.Exceptions;
 using Event_Management.Models;
-using EventManagement.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Event_Management.Repository
@@ -36,7 +35,13 @@ namespace Event_Management.Repository
             }
         }
 
-        public Ticket GetTicketById(int ticketId) => context.Ticket.FirstOrDefault(t => t.TicketID == ticketId);
+        public Ticket GetTicketById(int ticketId)
+        {
+            var evt = context.Ticket.FirstOrDefault(t => t.TicketID == ticketId);
+            if(evt == null)
+                throw new TicketNotFoundException(ticketId);
+            return evt;
+        }
 
         public IEnumerable<Ticket> GetAllTickets() => context.Ticket.ToList();
 

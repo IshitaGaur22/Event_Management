@@ -30,7 +30,7 @@ namespace Event_Management.Migrations
                 {
                     EventID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EventName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EventName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EventDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EventTime = table.Column<TimeOnly>(type: "time", nullable: false),
@@ -54,18 +54,19 @@ namespace Event_Management.Migrations
                 {
                     TicketID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    EventId = table.Column<int>(type: "int", nullable: false),
                     TotalSeats = table.Column<int>(type: "int", nullable: false),
-                    PricePerTicket = table.Column<float>(type: "real", nullable: false),
-                    EventID = table.Column<int>(type: "int", nullable: true)
+                    PricePerTicket = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ticket", x => x.TicketID);
                     table.ForeignKey(
-                        name: "FK_Ticket_Event_EventID",
-                        column: x => x.EventID,
+                        name: "FK_Ticket_Event_EventId",
+                        column: x => x.EventId,
                         principalTable: "Event",
-                        principalColumn: "EventID");
+                        principalColumn: "EventID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -74,9 +75,9 @@ namespace Event_Management.Migrations
                 column: "CategoryID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ticket_EventID",
+                name: "IX_Ticket_EventId",
                 table: "Ticket",
-                column: "EventID");
+                column: "EventId");
         }
 
         /// <inheritdoc />

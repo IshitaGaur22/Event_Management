@@ -19,20 +19,17 @@ namespace Event_Management.Repository
 
         public int AddEvent(Event ev)
         {
-            var evt = context.Event.FirstOrDefault(e => e.EventID == ev.EventID);
-            if (evt == null)
+            var existingEvent = context.Event.FirstOrDefault(e => e.EventID == ev.EventID);
+            if (existingEvent != null)
             {
                 return 0;
             }
-            context.Event.Add(evt);
+
+            context.Event.Add(ev); 
             return context.SaveChanges();
         }
-        public void Delete(string eventName)
-        {
-            var eventDetails = GetEvent(eventName);
-            if (eventDetails != null)
-                context.Event.Remove(eventDetails);
-        }
+
+
         public int UpdateEventName(int id,string newName)
         {
             var newEvent = context.Event.FirstOrDefault(e => e.EventID == id);
@@ -92,13 +89,21 @@ namespace Event_Management.Repository
         }
 
 
-        public Event GetEventByName(string eventName) =>context.Event
-           .FirstOrDefault(e => e.EventName.Contains(eventName, StringComparison.OrdinalIgnoreCase));
-
+        
 
         public List<Event> GetEventById(int id) => context.Event
             .Where(e => e.EventID == id)
             .ToList();
+
+        public Event GetEventByName(string eventName)
+        {
+
+            var evt = context.Event.FirstOrDefault(e => e.EventName.Contains(eventName, StringComparison.OrdinalIgnoreCase));
+            if (evt == null)
+                throw new InvalidOperationException($"No event found with name containing '{eventName}'.");
+
+            return evt;
+        }
 
         public List<Event> GetEventByLocation(string location) => context.Event
             .Where(e => e.Location == location)
@@ -107,7 +112,20 @@ namespace Event_Management.Repository
             .Where(e => e.EventDate == date)
             .ToList();
         public IEnumerable<Event> GetAllEvents() => context.Event.ToList();
-        public Event GetEvent(string eventName) => context.Event.FirstOrDefault(e => e.EventName == eventName);
+        public Event GetEvent(string eventName)
+        {
+            var evt = context.Event.FirstOrDefault(e => e.EventName == eventName);
+            if(evt == null)
+                throw new InvalidOperationException($"No event found with name '{eventName}'.");
+            return evt;
+        }
+
+        public void Delete(string eventName)
+        {
+            var eventDetails = GetEvent(eventName);
+            if (eventDetails != null)
+                context.Event.Remove(eventDetails);
+        }
 
     }
 
