@@ -49,5 +49,6 @@ namespace EventManagement.Data
         //    .HasForeignKey(t => t.EventId)
         //    .OnDelete(DeleteBehavior.Restrict);
         //}
+        public DbSet<Event_Management.Models.User> User { get; set; } = default!;
     }
 }

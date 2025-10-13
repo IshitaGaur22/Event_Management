@@ -4,10 +4,16 @@ namespace Event_Management.Services
 {
     public interface IEventService
     {
-        public List<Event> GetAllEvents();
-        public int AddEvent(Event e);
-        public int DeleteEvent(int id);
-        public int UpdateEvent(int id, Event e);
-
+        public int CreateEvent(Event ev);
+        void Delete(string eventName);
+        int UpdateEventName(int id, string newName);
+        int UpdateEventDescription(int id, string description);
+        int UpdateEventDate(int id, DateOnly date);
+        int UpdateEventTime(int id, TimeOnly time);
+        int UpdateEventLocation(int id, string location);
+        public Event FetchEventName(string eventName);
+        public Event FetchEventLocation(string location);
+        public Event FetchEvenDate(DateOnly date);
+        public IEnumerable<Event> GetAllEvents();
     }
 }

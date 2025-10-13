@@ -1,0 +1,104 @@
+﻿using Event_Management.Data;
+using Event_Management.Exceptions;
+using Event_Management.Models;
+using Event_Management.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Event_Management.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CategoriesController : ControllerBase
+    {
+        private readonly ICategoryService _service;
+
+        public CategoriesController(ICategoryService service)
+        {
+            _service = service;
+        }
+    
+
+        [HttpGet("{id}")]
+        public IActionResult GetCategoryById(int id)
+        {
+            try
+            {
+                var c = _service.GetCategoryById(id);
+                return Ok(c);
+            }
+            catch (CategoryNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<Category>), 200)]
+        public IActionResult GetAllCategories()
+        {
+            try
+            {
+                var c = _service.GetAllCategories();
+                return Ok(c);
+            }
+            catch(CategoryNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateCategoryDetails(int id, [FromBody] Category c)
+        {
+            if (id != c.CategoryID)
+                return BadRequest(new { error = $"Category ID mismatch. Route ID: {id}, Body ID: {c.CategoryID}" });
+
+            if (!ModelState.IsValid)
+                return BadRequest(new { error = "Invalid model state.", details = ModelState });
+
+            try
+            {
+                _service.UpdateCategoryDetails(c); 
+                return Ok(new { message = $"Category with ID {id} updated successfully." });
+            }
+            catch (CategoryNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (CategoryUpdateException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Unexpected error occurred.", details = ex.Message });
+            }
+        }
+
+        
+
+        [HttpDelete("{id}")] 
+        public IActionResult DeleteCategory(int id)
+        {
+            try
+            {
+                _service.DeleteCategory(id);
+                return Ok(new { message = $"Category with ID {id} deleted successfully." });
+            }
+            catch (CategoryNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (CategoryDeletionException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+    }
+}

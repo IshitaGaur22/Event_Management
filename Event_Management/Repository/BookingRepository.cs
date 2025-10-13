@@ -49,13 +49,10 @@ namespace Event_Management.Repository
             _context.SaveChanges();
         }
 
-        public void UpdateBooking(Booking booking)
+        public User GetUserByUsername(string username)
         {
-            _context.Booking.Update(booking);
-            _context.SaveChanges();
+            return _context.User.FirstOrDefault(u => u.UserName == username);
         }
-
-
 
     }
 }

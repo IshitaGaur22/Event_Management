@@ -1,46 +1,159 @@
 ﻿using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Repository;
+using Event_Management.Services;
+using NuGet.Versioning;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Event_Management.Services
 {
     public class EventService : IEventService
     {
-        public readonly IEventRepository repo;
-        public EventService(IEventRepository erepo)
+        private readonly IEventRepository repository;
+
+        public EventService(IEventRepository repo)
         {
-            repo = erepo;
+            repository = repo;
         }
 
-        public List<Event> GetAllEvents()
+        public int CreateEvent(Event ev)
         {
-            return repo.GetAllEvents();
+            if (repository.GetEventById(ev.EventID) != null)
+                throw new EventAlreadyExistsException(ev.EventID);
+
+            try
+            {
+                return repository.AddEvent(ev);
+            }
+            catch (Exception ex)
+            {
+                throw new EventCreationException(ex.Message);
+            }  
         }
 
-        public int AddEvent(Event e)
+        public void Delete(string eventName)
         {
-            if (repo.GetEventByID(e.EventID) != null)
+            if (repository.GetEvent(eventName) == null)
+                throw new EventsNotFoundException(eventName);
+            try
             {
-                throw new EventAlreadyExistsException($"Student with student id {e.EventID} already exists");
+                repository.Delete(eventName);
             }
-            return repo.AddEvent(e);
+            catch
+            {
+                throw new EventDeletionException(eventName);
+            }
+
         }
-        public int DeleteEvent(int id)
+//           if (repository.GetEvent(Event.) == null)
+//                throw new EventsNotFoundException(ev.EventName);
+
+//            if (string.IsNullOrWhiteSpace(newName))
+//                throw new ArgumentException("New event name cannot be empty.");
+
+//            //ev.EventName = newName;
+
+//            try
+//            {
+//                return repository.UpdateEventName(newName);
+//            }
+//            catch (Exception ex)
+//            {
+//                throw new EventUpdateException(ex.Message);
+//            }
+        public int UpdateEventName(int id, string newName)
         {
-            if(repo.GetEventByID(id) == null)
+
+            try
             {
-                throw new EventNotFoundException($"Student with student id {id} already exists");
+                return repository.UpdateEventName(id,newName);
             }
-            return repo.DeleteEvent(id);
+            catch (Exception ex)
+            {
+                throw new EventUpdateException(ex.Message);
+            }
+
         }
 
-        public int UpdateEvent(int id, Event e)
+        public int UpdateEventDescription(int id, string description)
         {
-            if (repo.GetEventByID(id) == null)
+            try
             {
-                throw new EventAlreadyExistsException($"Student with student id {id} already exists");
+                return repository.UpdateEventDescription(id,description);
             }
-            return repo.UpdateEvent(id, e);
+            catch (Exception ex)
+            {
+                throw new EventUpdateException(ex.Message);
+            }
+
         }
+
+        public int UpdateEventDate(int id, DateOnly date)
+        {
+            try
+            {
+                return repository.UpdateEventDate(id,date);
+            }
+            catch (Exception ex)
+            {
+                throw new EventUpdateException(ex.Message);
+            }
+
+        }
+
+        public int UpdateEventTime(int id, TimeOnly time)
+        {
+            try
+            {
+                return repository.UpdateEventTime(id,time);
+            }
+            catch (Exception ex)
+            {
+                throw new EventUpdateException(ex.Message);
+            }
+
+        }
+
+        public int UpdateEventLocation(int id, string location)
+        {
+            try
+            {
+                return repository.UpdateEventLocation(id,location);
+            }
+            catch (Exception ex)
+            {
+                throw new EventUpdateException(ex.Message);
+            }
+        }
+
+
+
+        public Event FetchEventName(string eventName)
+        {
+            var eventDetails = repository.GetEvent(eventName);
+            if (eventDetails == null)
+                throw new EventsNotFoundException(eventName);
+            return eventDetails;
+
+        }
+        public Event FetchEventLocation(string location)
+        {
+            var eventDetails = repository.GetEventByLocation(location);
+            if (eventDetails == null)
+                throw new EventsNotFoundException(location);
+            return eventDetails;
+
+        }
+        public Event FetchEvenDate(DateOnly date)
+        {
+            var eventDetails = repository.GetEventByDate(date);
+            return eventDetails;
+
+        }
+        public IEnumerable<Event> GetAllEvents() => repository.GetAllEvents();
+
+
     }
 }
+
+

@@ -4,12 +4,12 @@ namespace Event_Management.Repository
 {
     public interface ITicketRepository
     {
+        //public int AddTicket(Ticket ticket);
+        public Ticket GetTicketById(int ticketId);
+        public IEnumerable<Ticket> GetAllTickets();
+        public void UpdateTicketDetails(Ticket ticket);
 
-        Task<Ticket> GetTicketByIdAsync(int ticketId);
-        Task<IEnumerable<Ticket>> GetAllTicketsAsync();
-        Task AddTicketAsync(Ticket ticket);
-        Task UpdateTicketAsync(Ticket ticket);
-        Task SaveChangesAsync();
+        public void DeleteTicket(int ticketId);
 
     }
 }

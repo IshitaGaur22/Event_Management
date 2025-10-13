@@ -1,4 +1,6 @@
-﻿using Event_Management.Models;
+﻿using Event_Management.Data;
+using Event_Management.Exceptions;
+using Event_Management.Models;
 using EventManagement.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,27 +8,46 @@ namespace Event_Management.Repository
 {
     public class TicketRepository : ITicketRepository
     {
+        private readonly Event_ManagementContext context;
 
-        private readonly EventServiceContext _context;
-
-        public TicketRepository(EventServiceContext context)
+        public TicketRepository(Event_ManagementContext ctx)
         {
-            _context = context;
+            context = ctx;
         }
 
-        public async Task<Ticket> GetTicketByIdAsync(int ticketId)
+        //public int AddTicket(Ticket ticket)
+        //{
+        //    var evt = context.Ticket.FirstOrDefault(e => e.TicketID == ticket.TicketID);
+        //    if (evt != null)
+        //    {
+        //        return 0;
+        //    }
+        //    context.Ticket.Add(ticket);
+        //    return context.SaveChanges();
+        //}
+
+        public void DeleteTicket(int ticketId)
         {
-            return await _context.Ticket.FirstOrDefaultAsync(t => t.TicketId == ticketId);
+            var ticket = context.Ticket.Find(ticketId);
+            if (ticket != null)
+            {
+                context.Ticket.Remove(ticket);
+                context.SaveChanges();
+            }
         }
 
-        Task ITicketRepository.AddTicketAsync(Ticket ticket)
-        {
-            throw new NotImplementedException();
-        }
+        public Ticket GetTicketById(int ticketId) => context.Ticket.FirstOrDefault(t => t.TicketID == ticketId);
 
-        Task<IEnumerable<Ticket>> ITicketRepository.GetAllTicketsAsync()
+        public IEnumerable<Ticket> GetAllTickets() => context.Ticket.ToList();
+
+        public void UpdateTicketDetails(Ticket ticket)
         {
-            throw new NotImplementedException();
+            var existingTicket = context.Ticket.Find(ticket.TicketID);
+            if (existingTicket == null)
+                throw new TicketNotFoundException(ticket.TicketID);
+            existingTicket.TotalSeats = ticket.TotalSeats;
+            existingTicket.PricePerTicket = ticket.PricePerTicket;
+            context.SaveChanges();
         }
 
         Task ITicketRepository.SaveChangesAsync()
