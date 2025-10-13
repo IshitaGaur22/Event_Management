@@ -22,14 +22,16 @@ namespace Event_Management.Controllers
         {
             _service = service;
         }
-    
+
 
         [HttpGet("{id}")]
-        public IActionResult GetCategoryById(int id)
+        public IActionResult GetCategoryById(int? id)
         {
+            if(id==null)
+                return BadRequest( "Category ID is required.Please enter it");
             try
             {
-                var c = _service.GetCategoryById(id);
+                var c = _service.GetCategoryById(id.Value);
                 return Ok(c);
             }
             catch (CategoryNotFoundException ex)
@@ -47,7 +49,7 @@ namespace Event_Management.Controllers
                 var c = _service.GetAllCategories();
                 return Ok(c);
             }
-            catch(CategoryNotFoundException ex)
+            catch (CategoryNotFoundException ex)
             {
                 return NotFound(new { error = ex.Message });
             }
@@ -64,7 +66,7 @@ namespace Event_Management.Controllers
 
             try
             {
-                _service.UpdateCategoryDetails(c); 
+                _service.UpdateCategoryDetails(c);
                 return Ok(new { message = $"Category with ID {id} updated successfully." });
             }
             catch (CategoryNotFoundException ex)
@@ -81,14 +83,16 @@ namespace Event_Management.Controllers
             }
         }
 
-        
 
-        [HttpDelete("{id}")] 
-        public IActionResult DeleteCategory(int id)
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteCategory(int? id)
         {
+            if(id==null)
+                return BadRequest( "Category ID is required.Please enter it");
             try
             {
-                _service.DeleteCategory(id);
+                _service.DeleteCategory(id.Value);
                 return Ok(new { message = $"Category with ID {id} deleted successfully." });
             }
             catch (CategoryNotFoundException ex)

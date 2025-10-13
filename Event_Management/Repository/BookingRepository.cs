@@ -40,7 +40,7 @@ namespace Event_Management.Repository
 
         public Ticket GetLatestTicket()
         {
-            return _context.Ticket.OrderByDescending(t => t.TicketId).FirstOrDefault();
+            return _context.Ticket.OrderByDescending(t => t.TicketID).FirstOrDefault();
         }
 
         public void UpdateTicket(Ticket ticket)

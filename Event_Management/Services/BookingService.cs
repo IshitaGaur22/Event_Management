@@ -29,7 +29,7 @@ namespace Event_Management.Services
                 throw new Exception("User not found.");
             var booking = new Booking
             {
-                TicketId = ticket.TicketId,
+                TicketId = ticket.TicketID,
                 EventId = ticket.EventId,
                 UserId = user.UserId,
                 SelectedSeats = selectedSeats,

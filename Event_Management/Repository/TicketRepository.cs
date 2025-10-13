@@ -50,14 +50,14 @@ namespace Event_Management.Repository
             context.SaveChanges();
         }
 
-        Task ITicketRepository.SaveChangesAsync()
-        {
-            throw new NotImplementedException();
-        }
+        //Task ITicketRepository.SaveChangesAsync()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        Task ITicketRepository.UpdateTicketAsync(Ticket ticket)
-        {
-            throw new NotImplementedException();
-        }
+        //Task ITicketRepository.UpdateTicketAsync(Ticket ticket)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

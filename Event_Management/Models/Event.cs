@@ -11,8 +11,8 @@ namespace Event_Management.Models
             [Key]
             public int EventID { get; set; }
 
-            [Required(ErrorMessage = "Event name must be at least 3 characters.")]
-            [MinLength(3)]
+            [StringLength(100,MinimumLength =3,ErrorMessage = "Event name must be at least 3 characters.")]
+            
             public string EventName { get; set; }
 
             public string Description { get; set; }

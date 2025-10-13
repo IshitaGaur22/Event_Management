@@ -12,9 +12,10 @@ namespace Event_Management.Repository
         public int UpdateEventTime(int id,TimeOnly time);
         public int UpdateEventLocation(int id,string location);
         public Event GetEvent(string eventName);
-        public Event GetEventByLocation(string location);
-        public Event GetEventByDate(DateOnly date);
-        public Event GetEventById(int id);
+        public List<Event> GetEventByLocation(string location);
+        public List<Event> GetEventByDate(DateOnly date);
+        public List<Event> GetEventById(int id);
+        public Event GetEventByName(string eventName);
         public IEnumerable<Event> GetAllEvents();
 
 
