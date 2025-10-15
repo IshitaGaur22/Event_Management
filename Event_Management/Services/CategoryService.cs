@@ -12,21 +12,21 @@ namespace Event_Management.Services
         {
             repository = repo;
         }
-        //public int CreateCategory(Category c)
-        //{
-        //    if (repository.GetCategoryById(c.CategoryID) != null)
-        //        throw new CategoryAlreadyExistsException(c.CategoryID);
+        public int CreateCategories(Category c)
+        {
+            if (repository.GetCategoryById(c.CategoryID) != null)
+                throw new CategoryAlreadyExistsException(c.CategoryID);
 
-        //    try
-        //    {
-        //        return repository.AddCategory(c);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new CategoryCreationException(ex.Message);
-        //    }
+            try
+            {
+                return repository.AddCategory(c);
+            }
+            catch (Exception ex)
+            {
+                throw new CategoryCreationException(ex.Message);
+            }
 
-        //}
+        }
         public void UpdateCategoryDetails(Category c)
         {
             if (repository.GetCategoryById(c.CategoryID) == null)

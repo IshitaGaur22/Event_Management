@@ -66,7 +66,7 @@ namespace Event_Management.Controllers
                 return BadRequest("Cannot cancel past bookings.");
 
             booking.Status = "Cancelled";
-            booking.Ticket.TotalSeats += booking.SelectedSeats;
+            booking.Event.TotalSeats += booking.SelectedSeats;
 
             _bookingService.UpdateBooking(booking);
             return Ok("Booking cancelled and ticket count updated.");
@@ -81,7 +81,7 @@ namespace Event_Management.Controllers
                 EventDate = b.Event.EventDate,
                 Location = b.Event.Location,
                 SelectedSeats = b.SelectedSeats,
-                PricePerTicket = b.Ticket.PricePerTicket,
+                PricePerTicket = b.Event.PricePerTicket,
                 BookingDate = DateOnly.FromDateTime(b.BookingDate),
                 Status = b.Status
             };

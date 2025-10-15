@@ -4,7 +4,7 @@ namespace Event_Management.Repository
 {
     public interface ICategoryRepository
     {
-        //public int AddCategory(Category c);
+        public int AddCategory(Category c);
         public Category GetCategoryById(int CategoryId);
         public IEnumerable<Category> GetAllCategories();
         public void UpdateCategoryDetails(Category c);

@@ -6,12 +6,11 @@ namespace Event_Management.Repository
     {
         public int AddEvent(Event ev);
         public void Delete(string eventName);
-        public int UpdateEventName(int id, string newName);
-        public int UpdateEventDescription(int id, string description);
-        public int UpdateEventDate(int id, DateOnly date);
-        public int UpdateEventTime(int id, TimeOnly time);
-        public int UpdateEventLocation(int id, string location);
+       public int GetTotalEvents();
+        public int UpdateEvent(int id, string? name, string? description, DateOnly? date, TimeOnly? time, string? location);
         public int GetEvent(string eventName);
+        public Event GetEventbyId(int ticketId);
+        public IEnumerable<Event> GetAllTickets();
         public List<Event> GetEventByLocation(string location);
         public List<Event> GetEventByDate(DateOnly date);
         public List<Event> GetEventById(int id);

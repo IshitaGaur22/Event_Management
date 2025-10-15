@@ -16,9 +16,9 @@ namespace Event_Management.Models
 
         public int EventID { get; set; }
 
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "Event name must be at least 3 characters.")]
-
-        public string EventName { get; set; }
+            [StringLength(100,MinimumLength =3,ErrorMessage = "Event name must be at least 3 characters.")]
+            
+            public string EventName { get; set; }
 
         public string Description { get; set; }
 
@@ -34,13 +34,17 @@ namespace Event_Management.Models
 
         public string Location { get; set; }
 
-        //    [Required(ErrorMessage = "Please Choose a category.")]
+            [Required(ErrorMessage = "Please Choose a category.")]
+            public int CategoryID { get; set; }
 
-        //public int CategoryID { get; set; }
+            //public Category Category { get; set; }
+            [Required]
+            public int TotalSeats { get; set; }
 
-        public Category Category { get; set; }
+            [Required]
+            public decimal PricePerTicket { get; set; }
 
-        public ICollection<Ticket> Tickets { get; set; }
+
 
 
     }
@@ -68,3 +72,12 @@ namespace Event_Management.Models
     }
 
 }
+
+
+/*
+ * 1.total events
+ * 2.total bookings->booking table
+ * 3.total user->user table
+ * 4.total revenue->payment/booking idk some table
+ * 
+ */
