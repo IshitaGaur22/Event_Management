@@ -1,5 +1,5 @@
 ﻿using Event_Management.Models;
-using EventManagement.Data;
+using Event_Management.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,7 +23,7 @@ public class NotificationBackgroundService : BackgroundService
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var context = scope.ServiceProvider.GetRequiredService<EventServiceContext>();
+                var context = scope.ServiceProvider.GetRequiredService<Event_ManagementContext>();
 
                 var bookings = await context.Booking
                     .Include(b => b.Event)
@@ -37,7 +37,7 @@ public class NotificationBackgroundService : BackgroundService
                         ? $"Your ticket for event '{eventName}' has been confirmed successfully."
                         : $"Your ticket for event '{eventName}' has been cancelled successfully.";
 
-                    bool alreadySent = await context.Notifications.AnyAsync(n =>
+                    bool alreadySent = await context.Notification.AnyAsync(n =>
                         n.UserId == booking.UserId &&
                         n.EventId == booking.EventId &&
                         n.Message == message);
@@ -52,7 +52,7 @@ public class NotificationBackgroundService : BackgroundService
                             IsRead = false,
                             CreatedAt = DateTime.Now
                         };
-                        context.Notifications.Add(notification);
+                        context.Notification.Add(notification);
                     }
                 }
 
