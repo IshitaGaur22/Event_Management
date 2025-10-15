@@ -1,5 +1,5 @@
 ﻿using Event_Management.Models;
-using EventManagement.Data;
+using Event_Management.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
@@ -7,8 +7,8 @@ namespace Event_Management.Repository
 {
     public class BookingRepository : IBookingRepository
     {
-        private readonly EventServiceContext _context;
-        public BookingRepository(EventServiceContext context)
+        private readonly Event_ManagementContext _context;
+        public BookingRepository(Event_ManagementContext context)
         {
             _context = context;
         }
@@ -40,7 +40,7 @@ namespace Event_Management.Repository
 
         public Ticket GetLatestTicket()
         {
-            return _context.Ticket.OrderByDescending(t => t.TicketId).FirstOrDefault();
+            return _context.Ticket.Include(t=>t.Event).OrderByDescending(t => t.TicketID).FirstOrDefault();
         }
 
         public void UpdateTicket(Ticket ticket)
@@ -54,5 +54,9 @@ namespace Event_Management.Repository
             return _context.User.FirstOrDefault(u => u.UserName == username);
         }
 
+        public void UpdateBooking(Booking booking)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

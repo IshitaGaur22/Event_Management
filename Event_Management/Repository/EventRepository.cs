@@ -19,8 +19,8 @@ namespace Event_Management.Repository
 
         public int AddEvent(Event ev)
         {
-            var evt = context.Event.FirstOrDefault(e => e.EventID == ev.EventID);
-            if (evt != null)
+            var evt = context.Event.FirstOrDefault(e => e.EventName == ev.EventName);
+            if (evt == null)
             {
                 return 0;
             }
@@ -29,22 +29,14 @@ namespace Event_Management.Repository
         }
         public void Delete(string eventName)
         {
-            var eventDetails = GetEvent(eventName);
+            var eventDetails = GetEventByName(eventName);
             if (eventDetails != null)
                 context.Event.Remove(eventDetails);
         }
-        //var evt = context.Event.FirstOrDefault(e => e.EventName == newName);
-        //    if (evt != null)
-        //    {
-        //        return 0;
-        //    }
-            
-        //    context.Event.Update(evt);
-        //    return context.SaveChanges();
-        public int UpdateEventName(int id,string newName)
+        public int UpdateEventName(int id, string newName)
         {
             var newEvent = context.Event.FirstOrDefault(e => e.EventID == id);
-            if (newEvent != null)
+            if (newEvent == null)
             {
                 return 0;
             }
@@ -54,10 +46,10 @@ namespace Event_Management.Repository
 
         }
 
-        public int UpdateEventDescription(int id,string description)
+        public int UpdateEventDescription(int id, string description)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventID == id);
-            if (evt != null)
+            if (evt == null)
             {
                 return 0;
             }
@@ -65,10 +57,10 @@ namespace Event_Management.Repository
             context.Event.Update(evt);
             return context.SaveChanges();
         }
-        public int UpdateEventDate(int id,DateOnly date)
+        public int UpdateEventDate(int id, DateOnly date)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventID == id);
-            if (evt != null)
+            if (evt == null)
             {
                 return 0;
             }
@@ -76,10 +68,10 @@ namespace Event_Management.Repository
             context.Event.Update(evt);
             return context.SaveChanges();
         }
-        public int UpdateEventTime(int id,TimeOnly time)
+        public int UpdateEventTime(int id, TimeOnly time)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventID == id);
-            if (evt != null)
+            if (evt == null)
             {
                 return 0;
             }
@@ -87,10 +79,10 @@ namespace Event_Management.Repository
             context.Event.Update(evt);
             return context.SaveChanges();
         }
-        public int UpdateEventLocation(int id,string location)
+        public int UpdateEventLocation(int id, string location)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventID == id);
-            if (evt != null)
+            if (evt == null)
             {
                 return 0;
             }
@@ -100,15 +92,31 @@ namespace Event_Management.Repository
         }
 
 
-        public Event GetEvent(string eventName) => context.Event.FirstOrDefault(e => e.EventName == eventName);
+        public Event GetEventByName(string eventName) => context.Event
+           .FirstOrDefault(e => e.EventName.Contains(eventName, StringComparison.OrdinalIgnoreCase));
 
-        public Event GetEventById(int id) => context.Event.FirstOrDefault(e => e.EventID == id);
 
-        public Event GetEventByLocation(string location) => context.Event.FirstOrDefault(e => e.Location == location);
-        public Event GetEventByDate(DateOnly date) => context.Event.FirstOrDefault(e => e.EventDate == date);
+        public List<Event> GetEventById(int id) => context.Event
+            .Where(e => e.EventID == id)
+            .ToList();
+
+        public List<Event> GetEventByLocation(string location) => context.Event
+            .Where(e => e.Location == location)
+            .ToList();
+        public List<Event> GetEventByDate(DateOnly date) => context.Event
+            .Where(e => e.EventDate == date)
+            .ToList();
         public IEnumerable<Event> GetAllEvents() => context.Event.ToList();
+        public int GetEvent(string eventName)
+        {
+
+            var evt = context.Event.FirstOrDefault(e => e.EventName == eventName);
+            if (evt == null)
+            {
+                return 0;
+            }
+            return 1;
+        }
 
     }
-
-
 }

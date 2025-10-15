@@ -132,7 +132,7 @@ namespace Event_Management.Controllers
             if (date.ToString().Length == 0)
                 return BadRequest("You didn't enter new event date. Please enter it");
 
-            var ev = service.FetchEvenDate(date);
+            var ev = service.FetchEventDate(date);
             return Ok(ev);
         }
 

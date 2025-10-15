@@ -22,12 +22,12 @@ namespace Event_Management.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllTickets()
-        {
-            var tickets = await _ticketService.GetAllTicketsAsync();
-            return Ok(tickets);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllTickets()
+        //{
+        //    var tickets = await _ticketService.GetAllTicketsAsync();
+        //    return Ok(tickets);
+        //}
 
         [HttpGet("{id}")]
         public IActionResult GetTicketById(int id)

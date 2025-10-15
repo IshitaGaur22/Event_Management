@@ -20,8 +20,10 @@ namespace Event_Management.Controllers
         [HttpGet("upcoming Events")]
         public IActionResult GetUpcomingBookings([FromQuery] int userId)
         {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
             var bookings = _bookingService.GetAllBookings()
-                .Where(b => b.UserId == userId && b.Event.EventDate >= DateTime.Today)
+                .Where(b => b.UserId == userId && b.Event.EventDate >= today)
                 .Select(MapToDto)
                 .ToList();
 
@@ -31,8 +33,10 @@ namespace Event_Management.Controllers
         [HttpGet("past Events")]
         public IActionResult GetPastBookings([FromQuery] int userId)
         {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
             var bookings = _bookingService.GetAllBookings()
-                .Where(b => b.UserId == userId && b.Event.EventDate < DateTime.Today)
+                .Where(b => b.UserId == userId && b.Event.EventDate < today)
                 .Select(MapToDto)
                 .ToList();
 
@@ -45,18 +49,20 @@ namespace Event_Management.Controllers
             var bookings = _bookingService.GetAllBookings()
                 .Where(b => b.UserId == userId &&
                             (string.IsNullOrEmpty(eventName) || b.Event.EventName.Contains(eventName)) &&
-                            (!eventDate.HasValue || b.Event.EventDate.Date == eventDate.Value.Date))
+                            (!eventDate.HasValue || b.Event.EventDate == DateOnly.FromDateTime(eventDate.Value)))
                 .Select(MapToDto)
                 .ToList();
 
             return Ok(bookings);
         }
 
-        [HttpPut("{Booking id}/cancel")]
+        [HttpPut("{id}/cancel")]
         public IActionResult CancelBooking(int id)
         {
             var booking = _bookingService.GetBookingById(id);
-            if (booking == null || booking.Event.EventDate < DateTime.Today)
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            if (booking == null || booking.Event.EventDate < today)
                 return BadRequest("Cannot cancel past bookings.");
 
             booking.Status = "Cancelled";
@@ -76,7 +82,7 @@ namespace Event_Management.Controllers
                 Location = b.Event.Location,
                 SelectedSeats = b.SelectedSeats,
                 PricePerTicket = b.Ticket.PricePerTicket,
-                BookingDate = b.BookingDate,
+                BookingDate = DateOnly.FromDateTime(b.BookingDate),
                 Status = b.Status
             };
         }
