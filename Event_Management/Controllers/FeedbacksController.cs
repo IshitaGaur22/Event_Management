@@ -1,4 +1,5 @@
 ﻿using Event_Management.Data;
+using Event_Management.DTOs;
 using Event_Management.Models;
 using Event_Management.Services;
 using EventFeedback.Exceptions;
@@ -29,29 +30,22 @@ namespace Event_Management.Controllers
         }
 
 
-
         [HttpPost("SubmitFeedback")]
-        public ActionResult SubmitFeedback(Feedback feedback)
+        public ActionResult SubmitFeedback(CreateFeedbackDto feedback)
         {
             try
             {
-                return StatusCode(201, _service.SubmitFeedback(feedback)); //Place breakpoints and debug
+                return StatusCode(201, _service.SubmitFeedback(feedback)); 
+            }
+            catch(InvalidOperationException ex)
+            {
+                return StatusCode(500,ex.Message);
+            }
+            catch(FeedbackNotFound ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-
-
-        [HttpPut("UpdateFeedback/{id}")]
-        public IActionResult UpdateFeedback(int id, Feedback feedback)
-        {
-            try
-            {
-                return Ok(_service.UpdateFeedback(id, feedback));
-            }
-            catch (FeedbackNotFound e)
             {
                 return BadRequest(e.Message);
             }
@@ -85,7 +79,7 @@ namespace Event_Management.Controllers
             }
         }
 
-        [HttpGet("ReviewFeedbacks")]
+        [HttpGet("FilterFeedbacks")]
 
         public ActionResult<List<Feedback>> GetFilteredFeedbacks(
         string? eventName,
@@ -117,7 +111,7 @@ namespace Event_Management.Controllers
         }
 
         [HttpPost("ReplyToFeedback/{feedbackId}")]
-        public IActionResult ReplyToFeedback(int feedbackId, Replies reply)
+        public IActionResult ReplyToFeedback(int feedbackId, ReplyDto reply)
         {
             try
             {

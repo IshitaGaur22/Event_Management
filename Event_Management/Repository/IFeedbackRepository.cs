@@ -1,4 +1,5 @@
-﻿using Event_Management.Models;
+﻿using Event_Management.DTOs;
+using Event_Management.Models;
 
 namespace Event_Management.Repository
 {
@@ -8,8 +9,7 @@ namespace Event_Management.Repository
         List<Feedback> GetAllFeedbacks();
         Feedback GetFeedbackById(int id);
         Feedback FindFeedbackById_Admin(int id);
-        int UpdateFeedback(int id,Feedback feedback);
-        int SubmitFeedback(Feedback feedback);
+        int SubmitFeedback(CreateFeedbackDto feedbackDto);
         bool HasUserAttendedEvent(int userId, int eventId);
         bool HasUserAlreadySubmittedFeedback(int userId, int eventId);
         IEnumerable<object> GetTopRatedEvents();
@@ -20,7 +20,7 @@ namespace Event_Management.Repository
                     DateTime? endDate,
                     string? search);
         Replies GetReplyById(int id);
-        int AddReply(int feedbckId,Replies reply);
+        int AddReply(int feedbckId, ReplyDto reply);
         int ArchiveFeedback(int feedbackId);
         int UnArchiveFeedback(int feedbackId);
     }

@@ -19,27 +19,27 @@ builder.Services.AddControllers()
     });
 
 
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.InvalidModelStateResponseFactory = context =>
-    {
-        
-        if (!context.ModelState.IsValid &&
-            context.ModelState.Values.All(v => v.Errors.Count > 0))
-        {
-            return new BadRequestObjectResult(new
-            {
-                error = "Value have not been entered, please enter values."
-            });
-        }
+//builder.Services.Configure<ApiBehaviorOptions>(options =>
+//{
+//    options.InvalidModelStateResponseFactory = context =>
+//    {
 
-        return new BadRequestObjectResult(new
-        {
-            error = "Invalid model state.",
-            details = context.ModelState
-        });
-    };
-});
+//        if (!context.ModelState.IsValid &&
+//            context.ModelState.Values.All(v => v.Errors.Count > 0))
+//        {
+//            return new BadRequestObjectResult(new
+//            {
+//                error = "Value has not been entered, please enter values."
+//            });
+//        }
+
+//        return new BadRequestObjectResult(new
+//        {
+//            error = "Invalid model state.",
+//            details = context.ModelState
+//        });
+//    };
+//});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

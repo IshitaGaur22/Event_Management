@@ -57,7 +57,7 @@ namespace Event_Management.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Booking");
+                    b.ToTable("Booking", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Category", b =>
@@ -74,7 +74,7 @@ namespace Event_Management.Migrations
 
                     b.HasKey("CategoryID");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Event", b =>
@@ -111,7 +111,7 @@ namespace Event_Management.Migrations
 
                     b.HasIndex("CategoryID");
 
-                    b.ToTable("Event");
+                    b.ToTable("Event", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Feedback", b =>
@@ -165,7 +165,7 @@ namespace Event_Management.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Feedback");
+                    b.ToTable("Feedback", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Notification", b =>
@@ -194,7 +194,7 @@ namespace Event_Management.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notification");
+                    b.ToTable("Notification", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Payment", b =>
@@ -231,7 +231,7 @@ namespace Event_Management.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("Payment");
+                    b.ToTable("Payment", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Ticket", b =>
@@ -255,7 +255,7 @@ namespace Event_Management.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("Ticket");
+                    b.ToTable("Ticket", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.User", b =>
@@ -272,7 +272,7 @@ namespace Event_Management.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Booking", b =>
