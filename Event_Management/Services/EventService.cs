@@ -113,5 +113,3 @@ namespace Event_Management.Services
 
     }
 }
-
-

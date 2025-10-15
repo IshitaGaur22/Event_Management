@@ -20,5 +20,3 @@ namespace Event_Management.Repository
 
     }
 }
-
-

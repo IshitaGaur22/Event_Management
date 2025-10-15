@@ -97,8 +97,5 @@ namespace Event_Management.Repository
             return evt != null ? 1 : 0;
         }
 
-
     }
-
-
 }
