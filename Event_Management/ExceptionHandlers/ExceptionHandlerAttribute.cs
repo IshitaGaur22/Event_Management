@@ -1,4 +1,5 @@
 ﻿using Event_Management.Exceptions;
+using EventFeedback.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -76,12 +77,41 @@ namespace Event_Management.ExceptionHandlers
             {
                 context.Result = new BadRequestObjectResult(new { error = message });
             }
-            if (exceptionType == typeof(CategoryNotFoundException))
+            else if (exceptionType == typeof(CategoryNotFoundException))
             {
                 var result = new NotFoundObjectResult(message);
                 context.Result = result;
             }
-
+            else if (exceptionType == typeof(FeedbackAlreadyExists))
+            {
+                var result = new ConflictObjectResult(message);
+                context.Result = result;
+            }
+            else if (exceptionType == typeof(FeedbackNotFound))
+            {
+                var result = new NotFoundObjectResult(message);
+                context.Result = result;
+            }
+            else if (exceptionType == typeof(InvalidSortFieldException))
+            {
+                var result = new NotFoundObjectResult(message);
+                context.Result = result;
+            }
+            else if (exceptionType == typeof(ReplyAlreadyExists))
+            {
+                var result = new ConflictObjectResult(message);
+                context.Result = result;
+            }
+            else if (exceptionType == typeof(FeedbackAlreadyArchivedException))
+            {
+                var result = new ConflictObjectResult(message);
+                context.Result = result;
+            }
+            else if (exceptionType == typeof(FeedbackNotArchivedException))
+            {
+                var result = new ConflictObjectResult(message);
+                context.Result = result;
+            }
             else
             {
                 var result = new StatusCodeResult(500);
