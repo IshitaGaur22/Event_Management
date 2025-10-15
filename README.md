@@ -29,7 +29,7 @@ Ishita Gaur – Ticket Booking, Event Details, Booking Flow
 
 Swathi Kancharla – Event Management Dashboard     
 
-Mousoomi Shit – Feedback Module     
+Mousoomi Shit – Feedback and Replies Module     
 
 Akhila Sivayogi – Login & Registration    
 
