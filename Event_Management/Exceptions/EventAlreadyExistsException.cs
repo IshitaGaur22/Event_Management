@@ -4,6 +4,6 @@
     {
         public EventAlreadyExistsException() { }
         public EventAlreadyExistsException(int eventId): base($"Event with ID '{eventId}' already exists.") { }
-        //public override EventAlreadyExistsException(string eventName) : base($"Event with name '{eventName}' already exists.") { }
+        public EventAlreadyExistsException(string eventName) : base($"Event with name '{eventName}' already exists.") { }
     }
 }

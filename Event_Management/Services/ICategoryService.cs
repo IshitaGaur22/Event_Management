@@ -4,7 +4,8 @@ namespace Event_Management.Services
 {
     public interface ICategoryService
     {
-        //int CreateCategory(Category c);
+        public int CreateCategories(Category c);
+
         void UpdateCategoryDetails(Category c);
         Category GetCategoryById(int id);
         IEnumerable<Category> GetAllCategories();

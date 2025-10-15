@@ -12,6 +12,16 @@ namespace Event_Management.Repository
         {
             context = ctx;
         }
+        public int AddCategory(Category c)
+        {
+            var cat = context.Category.FirstOrDefault(e => e.CategoryName == c.CategoryName);
+            if (cat != null)
+            {
+                return 0;
+            }
+            context.Category.Add(c);
+            return context.SaveChanges();
+        }
 
 
         public Category GetCategoryById(int CategoryId) => context.Category.FirstOrDefault(t => t.CategoryID == CategoryId);

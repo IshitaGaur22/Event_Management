@@ -41,113 +41,51 @@ namespace Event_Management.Controllers
         }
 
 
-        [HttpPut("update-name")]
-        public IActionResult UpdateEventName([FromQuery] int id, [FromQuery] string? newName)
+
+    [HttpPut("update-event")]
+    public IActionResult UpdateEvent(
+    [FromQuery] int id,
+    [FromQuery] string? name,
+    [FromQuery] string? description,
+    [FromQuery] DateOnly? date,
+    [FromQuery] TimeOnly? time,
+    [FromQuery] string? location)
         {
-            if (string.IsNullOrWhiteSpace(newName))
-                return BadRequest("You didn't enter new event name. Please enter it");
+            if (name == null && description == null && date == null && time == null && location == null)
+                return BadRequest("No fields provided to update.");
 
             try
             {
-                service.UpdateEventName(id, newName);
-                return Ok("Event name updated successfully.");
+                service.UpdateEvent(id, name, description, date, time, location);
+                return Ok("Event updated successfully.");
             }
             catch (EventUpdateException ex)
             {
                 return BadRequest(new { error = ex.Message });
+
+            }
+            catch(EventsNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
             }
             catch (Exception)
             {
-                return BadRequest(new { error = "Check the value that you have entered" });
+                return BadRequest(new { error = "Check the values you have entered." });
             }
         }
 
-
-        [HttpPut("update-description")]
-        public IActionResult UpdateEventDescription([FromQuery] int id, [FromQuery] string? description)
+        [HttpGet("total-Events")]
+        [ProducesResponseType(typeof(IEnumerable<Event>), 200)]
+        public IActionResult GetTotalNumberOfEvents()
         {
-            if (string.IsNullOrWhiteSpace(description))
-                return BadRequest("You didn't enter new event description. Please enter it");
             try
             {
-                service.UpdateEventDescription(id, description);
-                return Ok("Event description updated successfully.");
+                var c = service.GetTotalEvents();
+                return Ok(c);
             }
-            catch (EventUpdateException ex)
+            catch (EventsNotFoundException ex)
             {
-                return BadRequest(new { error = ex.Message });
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { error = "Check the value that you have entered" });
-            }
-        }
-
-
-        [HttpPut("update-date")]
-        public IActionResult UpdateEventDate([FromQuery] int id, [FromQuery] DateOnly? date)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(new { error = "Check the value that you have entered" });
-
-            if (date == null)
-                return BadRequest("You didn't enter new event date. Please enter it");
-
-            try
-            {
-                service.UpdateEventDate(id, date.Value);
-                return Ok("Event date updated successfully.");
-            }
-            catch (EventUpdateException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { error = "Check the value that you have entered" });
-            }
-        }
-
-       
-
-        [HttpPut("update-time")]
-        public IActionResult UpdateEventTime([FromQuery] int id, [FromQuery] TimeOnly? time)
-        {
-
-            if (time == null)
-                return BadRequest("You didn't enter new event time. Please enter it");
-
-            try
-            {
-                service.UpdateEventTime(id, time.Value);
-                return Ok("Event time updated successfully.");
-            }
-            catch (EventUpdateException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { error = "Check the value that you have entered" });
-            }
-        }
-        [HttpPut("update-location")]
-        public IActionResult UpdateEventLocation([FromQuery] int id, [FromQuery] string? location)
-        {
-            if (string.IsNullOrWhiteSpace(location))
-                return BadRequest("You didn't enter new event location. Please enter it");
-            try
-            {
-                service.UpdateEventLocation(id, location);
-                return Ok("Event location updated successfully.");
-            }
-            catch (EventUpdateException ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { error = "Check the value that you have entered" });
+                return NotFound(new { error = ex.Message });
             }
         }
         [HttpGet]
@@ -159,19 +97,18 @@ namespace Event_Management.Controllers
                 var c = service.GetAllEvents();
                 return Ok(c);
             }
-            catch (CategoryNotFoundException ex)
+            catch (EventsNotFoundException ex)
             {
                 return NotFound(new { error = ex.Message });
             }
         }
         [HttpGet("by-name")]
-        public IActionResult GetEvent([FromQuery] string? eventName)
+        public IActionResult GetEventByName([FromQuery] string? eventName)
         {
             if (string.IsNullOrWhiteSpace(eventName))
                 return BadRequest("You didn't enter new event name. Please enter it");
             try
             {
-
                 var ev=service.FetchEventName(eventName);
                 return Ok(ev);
             }
@@ -204,6 +141,30 @@ namespace Event_Management.Controllers
             return Ok(ev);
         }
 
+        [HttpGet("tickets")]
+        [ProducesResponseType(typeof(IEnumerable<Event>), 200)]
+        public IActionResult GetAllTickets()
+        {
+            var Ticket = service.GetAllTickets();
+            return Ok(Ticket);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetEventById(int? id)
+        {
+            if (id == null)
+                return BadRequest("Event ID is required.Please enter it");
+            try
+            {
+                var ticket = service.GetEventbyId(id.Value);
+                return Ok(ticket);
+            }
+            catch (TicketNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+
 
         [HttpDelete("eventName")]
         public IActionResult DeleteEvent(string? eventName)
@@ -211,8 +172,17 @@ namespace Event_Management.Controllers
             if (string.IsNullOrWhiteSpace(eventName))
                 return BadRequest("You didn't enter new event name. Please enter it");
 
-            service.Delete(eventName);
-            return Ok("Availability deleted successfully.");
+            
+            try
+            {
+                service.Delete(eventName);
+                return Ok($"{eventName} Event deleted successfully.");
+
+            }
+            catch (EventsNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
         }
 
 

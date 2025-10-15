@@ -26,10 +26,17 @@ namespace Event_Management.Models
             [Required(ErrorMessage = "Location is required.")]
             public string Location { get; set; }
 
-            //[Required(ErrorMessage ="Please Choose a category.")]
-            //public int CategoryID { get; set; }
-            public Category Category { get; set; }
-            public ICollection<Ticket> Tickets { get; set; }
+            [Required(ErrorMessage = "Please Choose a category.")]
+            public int CategoryID { get; set; }
+
+            //public Category Category { get; set; }
+            [Required]
+            public int TotalSeats { get; set; }
+
+            [Required]
+            public float PricePerTicket { get; set; }
+
+
 
 
 
@@ -47,3 +54,12 @@ namespace Event_Management.Models
         }
     }
 }
+
+
+/*
+ * 1.total events
+ * 2.total bookings->booking table
+ * 3.total user->user table
+ * 4.total revenue->payment/booking idk some table
+ * 
+ */

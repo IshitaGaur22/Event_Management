@@ -33,6 +33,29 @@ namespace Event_Management.Controllers
                 return NotFound(new { error = ex.Message });
             }
         }
+        [HttpPost]
+        public IActionResult CreateCategories(Category cat)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { error = "Invalid model state.", details = ModelState });
+            if (cat == null)
+                return BadRequest("No values entered, please enter values.");
+
+
+            try
+            {
+                _service.CreateCategories(cat);
+                return StatusCode(201, new { message = "Category created successfully." });
+            }
+            catch (CategoryAlreadyExistsException ex)
+            {
+                return Conflict(new { error = ex.Message });
+            }
+            catch (CategoryCreationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Category>), 200)]

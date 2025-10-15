@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Event_Management.Migrations
 {
     /// <inheritdoc />
-    public partial class @event : Migration
+    public partial class e : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,7 +35,9 @@ namespace Event_Management.Migrations
                     EventDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EventTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CategoryID = table.Column<int>(type: "int", nullable: false)
+                    CategoryID = table.Column<int>(type: "int", nullable: false),
+                    TotalSeats = table.Column<int>(type: "int", nullable: false),
+                    PricePerTicket = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -48,44 +50,15 @@ namespace Event_Management.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Ticket",
-                columns: table => new
-                {
-                    TicketID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EventId = table.Column<int>(type: "int", nullable: false),
-                    TotalSeats = table.Column<int>(type: "int", nullable: false),
-                    PricePerTicket = table.Column<float>(type: "real", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Ticket", x => x.TicketID);
-                    table.ForeignKey(
-                        name: "FK_Ticket_Event_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Event",
-                        principalColumn: "EventID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Event_CategoryID",
                 table: "Event",
                 column: "CategoryID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Ticket_EventId",
-                table: "Ticket",
-                column: "EventId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Ticket");
-
             migrationBuilder.DropTable(
                 name: "Event");
 

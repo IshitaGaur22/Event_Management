@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Event_Management.Migrations
 {
     [DbContext(typeof(Event_ManagementContext))]
-    [Migration("20251013061649_event")]
-    partial class @event
+    [Migration("20251015061740_e")]
+    partial class e
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "8.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -72,35 +72,17 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("EventID");
-
-                    b.HasIndex("CategoryID");
-
-                    b.ToTable("Event");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Ticket", b =>
-                {
-                    b.Property<int>("TicketID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketID"));
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
                     b.Property<float>("PricePerTicket")
                         .HasColumnType("real");
 
                     b.Property<int>("TotalSeats")
                         .HasColumnType("int");
 
-                    b.HasKey("TicketID");
+                    b.HasKey("EventID");
 
-                    b.HasIndex("EventId");
+                    b.HasIndex("CategoryID");
 
-                    b.ToTable("Ticket");
+                    b.ToTable("Event");
                 });
 
             modelBuilder.Entity("Event_Management.Models.Event", b =>
@@ -114,23 +96,9 @@ namespace Event_Management.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("Event_Management.Models.Ticket", b =>
-                {
-                    b.HasOne("Event_Management.Models.Event", null)
-                        .WithMany("Tickets")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Event_Management.Models.Category", b =>
                 {
                     b.Navigation("Events");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Event", b =>
-                {
-                    b.Navigation("Tickets");
                 });
 #pragma warning restore 612, 618
         }
