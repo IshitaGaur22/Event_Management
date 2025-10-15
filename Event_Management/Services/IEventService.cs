@@ -12,8 +12,8 @@ namespace Event_Management.Services
         int UpdateEventTime(int id, TimeOnly time);
         int UpdateEventLocation(int id, string location);
         public Event FetchEventName(string eventName);
-        public Event FetchEventLocation(string location);
-        public Event FetchEvenDate(DateOnly date);
+        public List<Event> FetchEventLocation(string location);
+        public List<Event> FetchEventDate(DateOnly date);
         public IEnumerable<Event> GetAllEvents();
     }
 }

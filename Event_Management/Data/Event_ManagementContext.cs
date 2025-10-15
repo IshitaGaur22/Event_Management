@@ -9,7 +9,7 @@ namespace Event_Management.Data
 {
     public class Event_ManagementContext : DbContext
     {
-        public Event_ManagementContext (DbContextOptions<Event_ManagementContext> options)
+        public Event_ManagementContext(DbContextOptions<Event_ManagementContext> options)
             : base(options)
         {
         }
@@ -17,5 +17,8 @@ namespace Event_Management.Data
         public DbSet<Event_Management.Models.Event> Event { get; set; } = default!;
         public DbSet<Event_Management.Models.Ticket> Ticket { get; set; } = default!;
         public DbSet<Event_Management.Models.Category> Category { get; set; } = default!;
+        public DbSet<Event_Management.Models.Booking> Booking { get; set; }= default!;
+        public DbSet<Event_Management.Models.User> User { get; set; } = default!;
+        public DbSet<Event_Management.Models.Payment> Payment { get; set; } = default!;
     }
 }

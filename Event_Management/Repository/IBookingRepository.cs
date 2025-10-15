@@ -10,6 +10,7 @@ namespace Event_Management.Repository
         Ticket GetLatestTicket();
         void UpdateTicket(Ticket ticket);
         User GetUserByUsername(string username);
+        void UpdateBooking(Booking booking);
 
     }
 }

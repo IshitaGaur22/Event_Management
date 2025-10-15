@@ -1,9 +1,7 @@
 ﻿using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Repository;
-using Event_Management.Services;
-using NuGet.Versioning;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace Event_Management.Services
 {
@@ -18,8 +16,8 @@ namespace Event_Management.Services
 
         public int CreateEvent(Event ev)
         {
-            if (repository.GetEventById(ev.EventID) != null)
-                throw new EventAlreadyExistsException(ev.EventID);
+            if (repository.GetEvent(ev.EventName) == 1)
+                throw new EventAlreadyExistsException(ev.EventName);
 
             try
             {
@@ -28,7 +26,7 @@ namespace Event_Management.Services
             catch (Exception ex)
             {
                 throw new EventCreationException(ex.Message);
-            }  
+            }
         }
 
         public void Delete(string eventName)
@@ -45,45 +43,58 @@ namespace Event_Management.Services
             }
 
         }
-//           if (repository.GetEvent(Event.) == null)
-//                throw new EventsNotFoundException(ev.EventName);
+        //           if (repository.GetEvent(Event.) == null)
+        //                throw new EventsNotFoundException(ev.EventName);
 
-//            if (string.IsNullOrWhiteSpace(newName))
-//                throw new ArgumentException("New event name cannot be empty.");
+        //            if (string.IsNullOrWhiteSpace(newName))
+        //                throw new ArgumentException("New event name cannot be empty.");
 
-//            //ev.EventName = newName;
+        //            //ev.EventName = newName;
 
-//            try
-//            {
-//                return repository.UpdateEventName(newName);
-//            }
-//            catch (Exception ex)
-//            {
-//                throw new EventUpdateException(ex.Message);
-//            }
+        //            try
+        //            {
+        //                return repository.UpdateEventName(newName);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                throw new EventUpdateException(ex.Message);
+        //            }
         public int UpdateEventName(int id, string newName)
         {
-
             try
             {
-                return repository.UpdateEventName(id,newName);
+                var result = repository.UpdateEventName(id, newName);
+                if (result == 0)
+                    throw new EventUpdateException($"Event with ID {id} not found.");
+                return result;
             }
-            catch (Exception ex)
+            catch (EventUpdateException)
             {
-                throw new EventUpdateException(ex.Message);
+                throw;
             }
-
+            catch (Exception)
+            {
+                throw new EventUpdateException($"An error occurred while updating event ID {id}.");
+            }
         }
+
 
         public int UpdateEventDescription(int id, string description)
         {
             try
             {
-                return repository.UpdateEventDescription(id,description);
+                var result = repository.UpdateEventDescription(id, description);
+                if (result == 0)
+                    throw new EventUpdateException($"Event with ID {id} not found.");
+                return result;
             }
-            catch (Exception ex)
+            catch (EventUpdateException)
             {
-                throw new EventUpdateException(ex.Message);
+                throw;
+            }
+            catch (Exception)
+            {
+                throw new EventUpdateException($"An error occurred while updating event ID {id}.");
             }
 
         }
@@ -92,11 +103,18 @@ namespace Event_Management.Services
         {
             try
             {
-                return repository.UpdateEventDate(id,date);
+                var result = repository.UpdateEventDate(id, date);
+                if (result == 0)
+                    throw new EventUpdateException($"Event with ID {id} not found.");
+                return result;
             }
-            catch (Exception ex)
+            catch (EventUpdateException)
             {
-                throw new EventUpdateException(ex.Message);
+                throw;
+            }
+            catch (Exception)
+            {
+                throw new EventUpdateException($"An error occurred while updating event ID {id}.");
             }
 
         }
@@ -105,11 +123,18 @@ namespace Event_Management.Services
         {
             try
             {
-                return repository.UpdateEventTime(id,time);
+                var result = repository.UpdateEventTime(id, time);
+                if (result == 0)
+                    throw new EventUpdateException($"Event with ID {id} not found.");
+                return result;
             }
-            catch (Exception ex)
+            catch (EventUpdateException)
             {
-                throw new EventUpdateException(ex.Message);
+                throw;
+            }
+            catch (Exception)
+            {
+                throw new EventUpdateException($"An error occurred while updating event ID {id}.");
             }
 
         }
@@ -118,25 +143,35 @@ namespace Event_Management.Services
         {
             try
             {
-                return repository.UpdateEventLocation(id,location);
+                var result = repository.UpdateEventLocation(id, location);
+                if (result == 0)
+                    throw new EventUpdateException($"Event with ID {id} not found.");
+                return result;
             }
-            catch (Exception ex)
+            catch (EventUpdateException)
             {
-                throw new EventUpdateException(ex.Message);
+                throw;
+            }
+            catch (Exception)
+            {
+                throw new EventUpdateException($"An error occurred while updating event ID {id}.");
             }
         }
-
 
 
         public Event FetchEventName(string eventName)
         {
-            var eventDetails = repository.GetEvent(eventName);
+            var eventDetails = repository.GetEventByName(eventName);
+
             if (eventDetails == null)
                 throw new EventsNotFoundException(eventName);
-            return eventDetails;
 
+            return eventDetails;
         }
-        public Event FetchEventLocation(string location)
+
+
+
+        public List<Event> FetchEventLocation(string location)
         {
             var eventDetails = repository.GetEventByLocation(location);
             if (eventDetails == null)
@@ -144,9 +179,11 @@ namespace Event_Management.Services
             return eventDetails;
 
         }
-        public Event FetchEvenDate(DateOnly date)
+        public List<Event> FetchEventDate(DateOnly date)
         {
             var eventDetails = repository.GetEventByDate(date);
+            if (eventDetails == null)
+                throw new EventsNotFoundException(date);
             return eventDetails;
 
         }
@@ -155,5 +192,3 @@ namespace Event_Management.Services
 
     }
 }
-
-

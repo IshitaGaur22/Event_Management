@@ -1,4 +1,5 @@
-﻿using Event_Management.Models;
+﻿using Event_Management.DTOs;
+using Event_Management.Models;
 
 namespace Event_Management.Services
 {
@@ -7,7 +8,8 @@ namespace Event_Management.Services
 
         IEnumerable<Booking> GetAllBookings();
         Booking GetBookingById(int id);
-        int AddBooking(int selectedSeats, string userName);
+        BookingSummary AddBooking(int selectedSeats, string userName);
+        public void UpdateBooking(Booking booking);
 
     }
 }

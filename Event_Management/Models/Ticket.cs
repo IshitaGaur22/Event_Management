@@ -16,8 +16,9 @@ namespace Event_Management.Models
         public int TotalSeats { get; set; }
 
         [Required]
-        public float PricePerTicket { get; set; }
+        public decimal PricePerTicket { get; set; }
 
+        public virtual Event Event { get; set; }
 
         //[Required]
         //public int EventID { get; set; }
