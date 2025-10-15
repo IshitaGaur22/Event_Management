@@ -1,14 +1,8 @@
-﻿using Event_Management.Data;
-using Event_Management.Exceptions;
+﻿using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace Event_Management.Controllers
 {
@@ -22,19 +16,44 @@ namespace Event_Management.Controllers
         {
             _service = service;
         }
-    
+
 
         [HttpGet("{id}")]
-        public IActionResult GetCategoryById(int id)
+        public IActionResult GetCategoryById(int? id)
         {
+            if(id==null)
+                return BadRequest( "Category ID is required.Please enter it");
             try
             {
-                var c = _service.GetCategoryById(id);
+                var c = _service.GetCategoryById(id.Value);
                 return Ok(c);
             }
             catch (CategoryNotFoundException ex)
             {
                 return NotFound(new { error = ex.Message });
+            }
+        }
+        [HttpPost]
+        public IActionResult CreateCategories(Category cat)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { error = "Invalid model state.", details = ModelState });
+            if (cat == null)
+                return BadRequest("No values entered, please enter values.");
+
+
+            try
+            {
+                _service.CreateCategories(cat);
+                return StatusCode(201, new { message = "Category created successfully." });
+            }
+            catch (CategoryAlreadyExistsException ex)
+            {
+                return Conflict(new { error = ex.Message });
+            }
+            catch (CategoryCreationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
             }
         }
 
@@ -47,7 +66,7 @@ namespace Event_Management.Controllers
                 var c = _service.GetAllCategories();
                 return Ok(c);
             }
-            catch(CategoryNotFoundException ex)
+            catch (CategoryNotFoundException ex)
             {
                 return NotFound(new { error = ex.Message });
             }
@@ -64,7 +83,7 @@ namespace Event_Management.Controllers
 
             try
             {
-                _service.UpdateCategoryDetails(c); 
+                _service.UpdateCategoryDetails(c);
                 return Ok(new { message = $"Category with ID {id} updated successfully." });
             }
             catch (CategoryNotFoundException ex)
@@ -81,14 +100,16 @@ namespace Event_Management.Controllers
             }
         }
 
-        
 
-        [HttpDelete("{id}")] 
-        public IActionResult DeleteCategory(int id)
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteCategory(int? id)
         {
+            if(id==null)
+                return BadRequest( "Category ID is required.Please enter it");
             try
             {
-                _service.DeleteCategory(id);
+                _service.DeleteCategory(id.Value);
                 return Ok(new { message = $"Category with ID {id} deleted successfully." });
             }
             catch (CategoryNotFoundException ex)

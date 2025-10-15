@@ -12,27 +12,17 @@ namespace Event_Management.Repository
         {
             context = ctx;
         }
-
-        //public int AddCategory(Category c)
-        //{
-        //    var evt = context.Category.FirstOrDefault(e => e.CategoryID == c.CategoryID);
-        //    if (evt != null)
-        //    {
-        //        return 0;
-        //    }
-        //    context.Category.Add(c);
-        //    return context.SaveChanges();
-        //}
-
-        public void DeleteCategory(int CategoryId)
+        public int AddCategory(Category c)
         {
-            var cat = context.Category.Find(CategoryId);
+            var cat = context.Category.FirstOrDefault(e => e.CategoryName == c.CategoryName);
             if (cat != null)
             {
-                context.Category.Remove(cat);
-                context.SaveChanges();
+                return 0;
             }
+            context.Category.Add(c);
+            return context.SaveChanges();
         }
+
 
         public Category GetCategoryById(int CategoryId) => context.Category.FirstOrDefault(t => t.CategoryID == CategoryId);
 
@@ -46,6 +36,16 @@ namespace Event_Management.Repository
             existingTicket.CategoryName = c.CategoryName;
             
             context.SaveChanges();
+        }
+
+        public void DeleteCategory(int CategoryId)
+        {
+            var cat = context.Category.Find(CategoryId);
+            if (cat != null)
+            {
+                context.Category.Remove(cat);
+                context.SaveChanges();
+            }
         }
 
 

@@ -1,5 +1,5 @@
 ﻿using Event_Management.Models;
-using EventManagement.Data;
+using Event_Management.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,9 +12,9 @@ namespace Event_Management.Controllers
     [ApiController]
     public class NotificationController : ControllerBase
     {
-        private readonly EventServiceContext _context;
+        private readonly Event_ManagementContext _context;
 
-        public NotificationController(EventServiceContext context)
+        public NotificationController(Event_ManagementContext context)
         {
             _context = context;
         }
@@ -23,7 +23,7 @@ namespace Event_Management.Controllers
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetUserNotifications(int userId)
         {
-            var notifications = await _context.Notifications
+            var notifications = await _context.Notification
                 .Where(n => n.UserId == userId)
                 .OrderByDescending(n => n.CreatedAt)
                 .ToListAsync();
@@ -50,7 +50,7 @@ namespace Event_Management.Controllers
                     ? $"Your ticket for event '{eventName}' has been confirmed successfully."
                     : $"Your ticket for event '{eventName}' has been cancelled successfully.";
 
-                bool alreadySent = await _context.Notifications.AnyAsync(n =>
+                bool alreadySent = await _context.Notification.AnyAsync(n =>
                     n.UserId == booking.UserId &&
                     n.EventId == booking.EventId &&
                     n.Message == message);
@@ -66,7 +66,7 @@ namespace Event_Management.Controllers
                         CreatedAt = DateTime.Now
                     };
 
-                    _context.Notifications.Add(notification);
+                    _context.Notification.Add(notification);
                     notificationsSent++;
                 }
             }

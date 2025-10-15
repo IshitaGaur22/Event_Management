@@ -32,8 +32,8 @@ namespace Event_Management.Services
                 throw new Exception("User not found.");
             var booking = new Booking
             {
-                TicketId = ticket.TicketID,
-                EventId = ticket.EventId,
+                //TicketId = ticket.TicketID,
+                EventId = ticket.EventID,
                 UserId = user.UserId,
                 SelectedSeats = selectedSeats,
                 BookingDate = DateTime.Now,
@@ -47,7 +47,7 @@ namespace Event_Management.Services
             decimal amount= ticket.PricePerTicket * selectedSeats;
             var payment= new Payment
             {
-                TicketId= ticket.TicketID,
+                EventID= ticket.EventID,
                 BookingId = booking.BookingId,
                 Amount = amount,
                 PaymentDate = DateTime.Now,
@@ -58,10 +58,10 @@ namespace Event_Management.Services
             return new BookingSummary
             {
 
-                EventName = ticket.Event.EventName,
-                Location = ticket.Event.Location,
+                EventName = ticket.EventName,
+                Location = ticket.Location,
                 //EventDate = ticket.Event.EventDate,
-                Time = ticket.Event.EventTime,
+                Time = ticket.EventTime,
                 PricePerTicket = ticket.PricePerTicket,
                 SelectedSeats = selectedSeats,
                 TotalAmount = amount

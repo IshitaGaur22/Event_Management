@@ -2,16 +2,11 @@
 {
     public class EventsNotFoundException: ApplicationException
     {
-        private DateOnly date;
-
+        
         public EventsNotFoundException(string eventName)
-            : base($"Event with name '{eventName}' was not found.")
-        {
-        }
-
+            : base($"Event with  '{eventName}' was not found.") { }
         public EventsNotFoundException(DateOnly date)
-        {
-            this.date = date;
-        }
+            : base($"Event with date '{date}' was not found.") { }
+
     }
 }
