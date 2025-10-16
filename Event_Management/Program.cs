@@ -1,7 +1,9 @@
 ﻿using Event_Management.Data;
+using Event_Management.Data;
+using Event_Management.ExceptionHandlers;
+using Event_Management.Exceptions;
 using Event_Management.Repository;
 using Event_Management.Services;
-using Event_Management.ExceptionHandlers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -91,6 +93,13 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 
+builder.Services.AddScoped<IBookingHistoryRepository, BookingHistoryRepository>();
+builder.Services.AddScoped<IBookingHistoryService, BookingHistoryService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -104,6 +113,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 
 app.Run();

@@ -4,6 +4,7 @@ using Event_Management.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Event_Management.Migrations
 {
     [DbContext(typeof(Event_ManagementContext))]
-    partial class Event_ManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20251016032900_Create")]
+    partial class Create
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -109,6 +112,8 @@ namespace Event_Management.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("EventID");
+
+                    b.HasIndex("CategoryID");
 
                     b.ToTable("Event");
                 });
@@ -272,26 +277,6 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("PhoneNumber")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.HasKey("UserId");
 
                     b.ToTable("User");
@@ -316,37 +301,17 @@ namespace Event_Management.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Event_Management.Models.Feedback", b =>
+            modelBuilder.Entity("Event_Management.Models.Event", b =>
                 {
-                    b.HasOne("Event_Management.Models.Event", "Event")
-                        .WithMany()
-                        .HasForeignKey("EventId")
+                    b.HasOne("Event_Management.Models.Category", "Category")
+                        .WithMany("Events")
+                        .HasForeignKey("CategoryID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Event_Management.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-
-                    b.Navigation("User");
+                    b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("Event_Management.Models.Payment", b =>
-                {
-                    b.HasOne("Event_Management.Models.Booking", "Booking")
-                        .WithMany()
-                        .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Replies", b =>
             modelBuilder.Entity("Event_Management.Models.Feedback", b =>
                 {
                     b.HasOne("Event_Management.Models.Event", "Event")
@@ -401,13 +366,7 @@ namespace Event_Management.Migrations
 
             modelBuilder.Entity("Event_Management.Models.Category", b =>
                 {
-                    b.HasOne("Event_Management.Models.Feedback", "Feedback")
-                        .WithMany()
-                        .HasForeignKey("FeedbackId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Feedback");
+                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }
