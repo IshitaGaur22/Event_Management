@@ -52,7 +52,7 @@ namespace Event_Management.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Booking");
+                    b.ToTable("Booking", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Category", b =>
@@ -69,7 +69,7 @@ namespace Event_Management.Migrations
 
                     b.HasKey("CategoryID");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Event", b =>
@@ -110,7 +110,7 @@ namespace Event_Management.Migrations
 
                     b.HasKey("EventID");
 
-                    b.ToTable("Event");
+                    b.ToTable("Event", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Feedback", b =>
@@ -164,7 +164,7 @@ namespace Event_Management.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Feedback");
+                    b.ToTable("Feedback", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Notification", b =>
@@ -193,7 +193,7 @@ namespace Event_Management.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notification");
+                    b.ToTable("Notification", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Payment", b =>
@@ -294,7 +294,7 @@ namespace Event_Management.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("Event_Management.Models.Booking", b =>
