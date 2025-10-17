@@ -1,6 +1,8 @@
-﻿using Event_Management.Exceptions;
+﻿using Event_Management.Data;
+using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Repository;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Event_Management.Services
@@ -8,15 +10,25 @@ namespace Event_Management.Services
     public class EventService : IEventService
     {
         private readonly IEventRepository repository;
+        private readonly Event_ManagementContext _context;
+        private readonly IEmailService _emailService;
 
-        public EventService(IEventRepository repo)
+        public EventService(IEventRepository repo, Event_ManagementContext context, IEmailService emailService)
         {
             repository = repo;
+            _context = context;
+            _emailService = emailService;
         }
+        
+
+        
+
+      
+
 
         public int CreateEvent(Event ev)
         {
-            if (repository.GetEvent(ev.EventName) == 1)
+            if (repository.GetEvent(ev.EventName) == 1) 
                 throw new EventAlreadyExistsException(ev.EventName);
 
             try
@@ -29,9 +41,19 @@ namespace Event_Management.Services
             }
         }
 
+        public Event GetEventbyId(int id)
+        {
+            var ticket = repository.GetEventbyId(id);
+            if (ticket == null)
+                throw new TicketNotFoundException(id);
+            return ticket;
+        }
+        public IEnumerable<Event> GetAllTickets() => repository.GetAllTickets();
+
+
         public void Delete(string eventName)
         {
-            if (repository.GetEvent(eventName) == null)
+            if (repository.GetEvent(eventName) == 0)
                 throw new EventsNotFoundException(eventName);
             try
             {
@@ -43,27 +65,16 @@ namespace Event_Management.Services
             }
 
         }
-        //           if (repository.GetEvent(Event.) == null)
-        //                throw new EventsNotFoundException(ev.EventName);
-
-        //            if (string.IsNullOrWhiteSpace(newName))
-        //                throw new ArgumentException("New event name cannot be empty.");
-
-        //            //ev.EventName = newName;
-
-        //            try
-        //            {
-        //                return repository.UpdateEventName(newName);
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                throw new EventUpdateException(ex.Message);
-        //            }
-        public int UpdateEventName(int id, string newName)
+        public int GetTotalEvents()
+        {
+            return repository.GetTotalEvents();
+        }
+        
+        public int UpdateEvent(int id, string? name, string? description, DateOnly? date, TimeOnly? time, string? location)
         {
             try
             {
-                var result = repository.UpdateEventName(id, newName);
+                var result = repository.UpdateEvent(id, name, description, date, time, location);
                 if (result == 0)
                     throw new EventUpdateException($"Event with ID {id} not found.");
                 return result;
@@ -78,85 +89,6 @@ namespace Event_Management.Services
             }
         }
 
-
-        public int UpdateEventDescription(int id, string description)
-        {
-            try
-            {
-                var result = repository.UpdateEventDescription(id, description);
-                if (result == 0)
-                    throw new EventUpdateException($"Event with ID {id} not found.");
-                return result;
-            }
-            catch (EventUpdateException)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-                throw new EventUpdateException($"An error occurred while updating event ID {id}.");
-            }
-
-        }
-
-        public int UpdateEventDate(int id, DateOnly date)
-        {
-            try
-            {
-                var result = repository.UpdateEventDate(id, date);
-                if (result == 0)
-                    throw new EventUpdateException($"Event with ID {id} not found.");
-                return result;
-            }
-            catch (EventUpdateException)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-                throw new EventUpdateException($"An error occurred while updating event ID {id}.");
-            }
-
-        }
-
-        public int UpdateEventTime(int id, TimeOnly time)
-        {
-            try
-            {
-                var result = repository.UpdateEventTime(id, time);
-                if (result == 0)
-                    throw new EventUpdateException($"Event with ID {id} not found.");
-                return result;
-            }
-            catch (EventUpdateException)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-                throw new EventUpdateException($"An error occurred while updating event ID {id}.");
-            }
-
-        }
-
-        public int UpdateEventLocation(int id, string location)
-        {
-            try
-            {
-                var result = repository.UpdateEventLocation(id, location);
-                if (result == 0)
-                    throw new EventUpdateException($"Event with ID {id} not found.");
-                return result;
-            }
-            catch (EventUpdateException)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-                throw new EventUpdateException($"An error occurred while updating event ID {id}.");
-            }
-        }
 
 
         public Event FetchEventName(string eventName)
@@ -168,6 +100,7 @@ namespace Event_Management.Services
 
             return eventDetails;
         }
+
 
 
 
@@ -186,6 +119,22 @@ namespace Event_Management.Services
                 throw new EventsNotFoundException(date);
             return eventDetails;
 
+        }
+
+
+        public async Task NotifyUsersAboutEventChange(Event eventObj, string changeType)
+        {
+            var bookings = await _context.Booking
+                .Include(b => b.User)
+                .Where(b => b.EventId == eventObj.EventID)
+                .ToListAsync();
+
+            foreach (var booking in bookings)
+            {
+                string subject = $"Event {changeType}: {eventObj.EventName}";
+                string body = $"Hi {booking.User.UserName},\n\nThe event '{eventObj.EventName}' has been {changeType.ToLower()}.\nDate: {eventObj.EventDate}\nTime: {eventObj.EventTime}\nLocation: {eventObj.Location}\n\nPlease check your booking details.";
+                await _emailService.SendEmailAsync(booking.User.Email, subject, body);
+            }
         }
         public IEnumerable<Event> GetAllEvents() => repository.GetAllEvents();
 

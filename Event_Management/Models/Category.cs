@@ -11,7 +11,7 @@ namespace Event_Management.Models
         [Required(ErrorMessage = "Category name is required.")]
         public string CategoryName { get; set; }
 
-        //public ICollection<Event> Events { get; set; }
+       // public ICollection<Event> Events { get; set; }
 
     }
 }

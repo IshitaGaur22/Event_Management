@@ -20,81 +20,65 @@ namespace Event_Management.Repository
         public int AddEvent(Event ev)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventName == ev.EventName);
-            if (evt == null)
+            if (evt != null)
             {
                 return 0;
             }
             context.Event.Add(ev);
             return context.SaveChanges();
         }
+        public int GetTotalEvents()
+        {
+            return context.Event.Count();
+        }
+
+        public Event GetEventbyId(int ticketId)
+        {
+            var evt = context.Event.FirstOrDefault(t => t.EventID == ticketId);
+            if (evt == null)
+                throw new TicketNotFoundException(ticketId);
+            return evt;
+        }
+
+        public IEnumerable<Event> GetAllTickets() => context.Event.ToList();
+
         public void Delete(string eventName)
         {
-            var eventDetails = GetEventByName(eventName);
-            if (eventDetails != null)
-                context.Event.Remove(eventDetails);
-        }
-        public int UpdateEventName(int id, string newName)
-        {
-            var newEvent = context.Event.FirstOrDefault(e => e.EventID == id);
-            if (newEvent == null)
-            {
-                return 0;
-            }
-            newEvent.EventName = newName;
-            context.Event.Update(newEvent);
-            return context.SaveChanges();
+            var evt = context.Event.FirstOrDefault(e => e.EventName == eventName);
 
+
+            context.Event.Remove(evt);
+            context.SaveChanges();
         }
 
-        public int UpdateEventDescription(int id, string description)
+        public int UpdateEvent(int id, string? name, string? description, DateOnly? date, TimeOnly? time, string? location)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventID == id);
             if (evt == null)
-            {
                 return 0;
-            }
-            evt.Description = description;
-            context.Event.Update(evt);
-            return context.SaveChanges();
-        }
-        public int UpdateEventDate(int id, DateOnly date)
-        {
-            var evt = context.Event.FirstOrDefault(e => e.EventID == id);
-            if (evt == null)
-            {
-                return 0;
-            }
-            evt.EventDate = date;
-            context.Event.Update(evt);
-            return context.SaveChanges();
-        }
-        public int UpdateEventTime(int id, TimeOnly time)
-        {
-            var evt = context.Event.FirstOrDefault(e => e.EventID == id);
-            if (evt == null)
-            {
-                return 0;
-            }
-            evt.EventTime = time;
-            context.Event.Update(evt);
-            return context.SaveChanges();
-        }
-        public int UpdateEventLocation(int id, string location)
-        {
-            var evt = context.Event.FirstOrDefault(e => e.EventID == id);
-            if (evt == null)
-            {
-                return 0;
-            }
-            evt.Location = location;
+
+            if (!string.IsNullOrWhiteSpace(name))
+                evt.EventName = name;
+
+            if (!string.IsNullOrWhiteSpace(description))
+                evt.Description = description;
+
+            if (date.HasValue)
+                evt.EventDate = date.Value;
+
+            if (time.HasValue)
+                evt.EventTime = time.Value;
+
+            if (!string.IsNullOrWhiteSpace(location))
+                evt.Location = location;
+
             context.Event.Update(evt);
             return context.SaveChanges();
         }
 
-
-        public Event GetEventByName(string eventName) => context.Event
-           .FirstOrDefault(e => e.EventName.Contains(eventName, StringComparison.OrdinalIgnoreCase));
-
+        public Event GetEventByName(string eventName) =>
+    context.Event.Single(e =>
+        e.EventName==eventName);
 
         public List<Event> GetEventById(int id) => context.Event
             .Where(e => e.EventID == id)
@@ -109,13 +93,8 @@ namespace Event_Management.Repository
         public IEnumerable<Event> GetAllEvents() => context.Event.ToList();
         public int GetEvent(string eventName)
         {
-
             var evt = context.Event.FirstOrDefault(e => e.EventName == eventName);
-            if (evt == null)
-            {
-                return 0;
-            }
-            return 1;
+            return evt != null ? 1 : 0;
         }
 
     }

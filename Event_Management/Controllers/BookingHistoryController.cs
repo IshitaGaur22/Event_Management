@@ -1,8 +1,6 @@
 ﻿using Event_Management.DTOs;
-using Event_Management.Models;
 using Event_Management.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 
 namespace Event_Management.Controllers
 {
@@ -10,81 +8,53 @@ namespace Event_Management.Controllers
     [ApiController]
     public class BookingHistoryController : ControllerBase
     {
-        private readonly IBookingService _bookingService;
+        private readonly IBookingHistoryService _bookingService;
 
-        public BookingHistoryController(IBookingService bookingService)
+        public BookingHistoryController(IBookingHistoryService bookingService)
         {
             _bookingService = bookingService;
         }
 
-        [HttpGet("upcoming Events")]
-        public IActionResult GetUpcomingBookings([FromQuery] int userId)
+        [HttpGet("Upcoming/{userId}")]
+        public async Task<ActionResult<IEnumerable<BookingHistoryDTO>>> GetUpcomingBookings(int userId)
         {
-            var today = DateOnly.FromDateTime(DateTime.Now);
-
-            var bookings = _bookingService.GetAllBookings()
-                .Where(b => b.UserId == userId && b.Event.EventDate >= today)
-                .Select(MapToDto)
-                .ToList();
-
-            return Ok(bookings);
+            var result = await _bookingService.GetUpcomingBookings(userId);
+            return Ok(result);
         }
 
-        [HttpGet("past Events")]
-        public IActionResult GetPastBookings([FromQuery] int userId)
+        [HttpGet("Past/{userId}")]
+        public async Task<ActionResult<IEnumerable<BookingHistoryDTO>>> GetPastBookings(int userId)
         {
-            var today = DateOnly.FromDateTime(DateTime.Now);
-
-            var bookings = _bookingService.GetAllBookings()
-                .Where(b => b.UserId == userId && b.Event.EventDate < today)
-                .Select(MapToDto)
-                .ToList();
-
-            return Ok(bookings);
+            var result = await _bookingService.GetPastBookings(userId);
+            return Ok(result);
         }
 
-        [HttpGet("search By Filter")]
-        public IActionResult SearchBookings([FromQuery] int userId, [FromQuery] string eventName, [FromQuery] DateTime? eventDate)
+        [HttpGet("SearchByEventName")]
+        public async Task<ActionResult<IEnumerable<BookingHistoryDTO>>> SearchByEventName(int userId, string eventName)
         {
-            var bookings = _bookingService.GetAllBookings()
-                .Where(b => b.UserId == userId &&
-                            (string.IsNullOrEmpty(eventName) || b.Event.EventName.Contains(eventName)) &&
-                            (!eventDate.HasValue || b.Event.EventDate == DateOnly.FromDateTime(eventDate.Value)))
-                .Select(MapToDto)
-                .ToList();
-
-            return Ok(bookings);
+            var result = await _bookingService.SearchByEventName(userId, eventName);
+            return Ok(result);
         }
 
-        [HttpPut("{id}/cancel")]
-        public IActionResult CancelBooking(int id)
+        [HttpGet("SearchByDate")]
+        public async Task<ActionResult<IEnumerable<BookingHistoryDTO>>> SearchByDate(int userId, DateOnly date)
         {
-            var booking = _bookingService.GetBookingById(id);
-            var today = DateOnly.FromDateTime(DateTime.Now);
-
-            if (booking == null || booking.Event.EventDate < today)
-                return BadRequest("Cannot cancel past bookings.");
-
-            booking.Status = "Cancelled";
-            booking.Ticket.TotalSeats += booking.SelectedSeats;
-
-            _bookingService.UpdateBooking(booking);
-            return Ok("Booking cancelled and ticket count updated.");
+            var result = await _bookingService.SearchByDate(userId, date);
+            return Ok(result);
         }
 
-        private BookingHistoryDto MapToDto(Booking b)
+        [HttpPut("Cancel/{bookingId}")]
+        public async Task<IActionResult> CancelBooking(int bookingId)
         {
-            return new BookingHistoryDto
+            try
             {
-                BookingId = b.BookingId,
-                EventName = b.Event.EventName,
-                EventDate = b.Event.EventDate,
-                Location = b.Event.Location,
-                SelectedSeats = b.SelectedSeats,
-                PricePerTicket = b.Ticket.PricePerTicket,
-                BookingDate = DateOnly.FromDateTime(b.BookingDate),
-                Status = b.Status
-            };
+                await _bookingService.CancelBooking(bookingId);
+                return Ok(new { message = "Booking cancelled successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

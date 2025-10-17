@@ -7,8 +7,8 @@ namespace Event_Management.Repository
         Booking GetBookingById(int id);
         IEnumerable<Booking> GetAllBookings();
         int AddBooking(Booking booking);
-        Ticket GetLatestTicket();
-        void UpdateTicket(Ticket ticket);
+        Event GetLatestTicket();
+        void UpdateTicket(Event ticket);
         User GetUserByUsername(string username);
         void UpdateBooking(Booking booking);
 

@@ -17,7 +17,7 @@ namespace Event_Management.Repository
         public Booking GetBookingById(int id)
         {
             return _context.Booking
-                .Include(b => b.Ticket)
+                //.Include(b => b.Ticket)
                 .Include(b => b.Event)
                 .Include(b => b.User)
                 .FirstOrDefault(b => b.BookingId == id);
@@ -26,7 +26,7 @@ namespace Event_Management.Repository
         public IEnumerable<Booking> GetAllBookings()
         {
             return _context.Booking
-                .Include(b => b.Ticket)
+                //.Include(b => b.Ticket)
                 .Include(b => b.Event)
                 .Include(b => b.User)
                 .ToList();
@@ -38,14 +38,14 @@ namespace Event_Management.Repository
             return _context.SaveChanges();
         }
 
-        public Ticket GetLatestTicket()
+        public Event GetLatestTicket()
         {
-            return _context.Ticket.Include(t=>t.Event).OrderByDescending(t => t.TicketID).FirstOrDefault();
+            return _context.Event.OrderByDescending(t => t.EventID).FirstOrDefault();
         }
 
-        public void UpdateTicket(Ticket ticket)
+        public void UpdateTicket(Event ticket)
         {
-            _context.Ticket.Update(ticket);
+            _context.Event.Update(ticket);
             _context.SaveChanges();
         }
 
