@@ -3,6 +3,8 @@ using Event_Management.DTOs;
 using Event_Management.Models;
 using Event_Management.Repository;
 using Microsoft.AspNetCore.Identity.Data;
+using Org.BouncyCastle.Crypto.Generators;
+using BCrypt;
 
 namespace Event_Management.Services
 {

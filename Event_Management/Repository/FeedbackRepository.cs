@@ -141,9 +141,7 @@ namespace Event_Management.Repository
         }
         public int ArchiveFeedback(int feedbackId)
         {
-            var feed=_context.Feedback.FirstOrDefault(s => s.FeedbackId == feedbackId);
-            feed.IsArchived = true;
-            return _context.SaveChanges();
+            return _context.Database.ExecuteSqlRaw("EXEC ArchiveFeedbackById @FeedbackId = {0}",feedbackId);
         }
         public int UnArchiveFeedback(int feedbackId)
         {

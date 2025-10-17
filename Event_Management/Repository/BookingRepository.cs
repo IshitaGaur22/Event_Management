@@ -25,11 +25,7 @@ namespace Event_Management.Repository
 
         public IEnumerable<Booking> GetAllBookings()
         {
-            return _context.Booking
-                //.Include(b => b.Ticket)
-                .Include(b => b.Event)
-                .Include(b => b.User)
-                .ToList();
+            return _context.Booking.ToList();
         }
 
         public int AddBooking(Booking booking)
