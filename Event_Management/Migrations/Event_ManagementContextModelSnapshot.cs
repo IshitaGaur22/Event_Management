@@ -364,7 +364,7 @@ namespace Event_Management.Migrations
                     b.Navigation("Event");
 
                     b.Navigation("User");
-                });
+                }));
 
             modelBuilder.Entity("Event_Management.Models.Notification", b =>
                 {
