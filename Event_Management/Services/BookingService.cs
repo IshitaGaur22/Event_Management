@@ -21,16 +21,13 @@ namespace Event_Management.Services
 
        
 
-        public IEnumerable<Booking> GetAllBookings()
+        
+        //Post
+        public BookingSummary AddBooking(int selectedSeats, string userName, int eventId)
         {
-            return _bookingRepository.GetAllBookings();
-        }
-
-        public BookingSummary AddBooking(int selectedSeats, string userName)
-        {
-            var ticket = _bookingRepository.GetLatestTicket();
-            if (ticket == null || selectedSeats > ticket.TotalSeats)
-                throw new Exception("Invalid ticket or seat count.");
+            var ev = _bookingRepository.GetEventById(eventId);
+            if (ev == null || selectedSeats > ev.TotalSeats)
+                throw new Exception("Invalid event or seat count.");
 
             var user = _bookingRepository.GetUserByUsername(userName);
             if (user == null)
@@ -45,8 +42,8 @@ namespace Event_Management.Services
                 Status = "Confirmed"
             };
 
-            ticket.TotalSeats -= selectedSeats;
-            _bookingRepository.UpdateTicket(ticket);
+            ev.TotalSeats -= selectedSeats;
+            _bookingRepository.UpdateEventSeats(ev);
             _bookingRepository.AddBooking(booking);
 
             decimal amount = ticket.PricePerTicket * selectedSeats;
@@ -55,10 +52,12 @@ namespace Event_Management.Services
                 EventID = ticket.EventID,
                 BookingId = booking.BookingId,
                 Amount = amount,
+                //TotalAmount = amount,
                 PaymentDate = DateTime.Now,
                 PaymentMethod = "Credit Card",
                 Status = "Completed"
             };
+
             _paymentRepository.AddPayment(payment);
 
             // ✅ Send Confirmation Email
@@ -77,14 +76,86 @@ namespace Event_Management.Services
             };
         }
 
+        //Get
+        public IEnumerable<Booking> GetAllBookings()
+        {
+            return _bookingRepository.GetAllBookings();
+        }
         public Booking GetBookingById(int id)
         {
             return _bookingRepository.GetBookingById(id);
         }
 
+        public User GetUserByUsername(string username)
+        {
+            return _bookingRepository.GetUserByUsername(username);
+        }
+
+        public IEnumerable<Booking> GetBookingByName(string username)
+        {
+            return _bookingRepository.GetBookingByName(username);
+        }
+
+        public object GetSeats(int id)
+        {
+            return _bookingRepository.GetSeats(id);
+        }
+    
+        public bool IsSeatAvailable(int eventId, int requestedSeats)
+        {
+            var ev = _bookingRepository.GetEventById(eventId);
+            return ev != null && ev.TotalSeats >= requestedSeats;
+        }
+
+        public IEnumerable<Booking> GetBookingsByEvent(int eventId)
+        {
+            return _bookingRepository.GetBookingsByEvent(eventId);
+        }
+
+        public IEnumerable<Event> GetTopBookedEvents(int count)
+        {
+            return _bookingRepository.GetTopBookedEvents(count);
+        }
+        public Payment GetPaymentByBookingId(int bookingId)
+        {
+            return _paymentRepository.GetPaymentByBookingId(bookingId);
+        }
+
+
+        //Put
         public void UpdateBooking(Booking booking)
         {
             _bookingRepository.UpdateBooking(booking);
+        }
+        public int UpdateCompletedBookings()
+        {
+            var now = DateTime.Now;
+            var today = DateOnly.FromDateTime(now);
+            var currentTime = TimeOnly.FromDateTime(now);
+
+            var bookingsToUpdate = _bookingRepository.GetPendingBookingsWithEvents()
+                .Where(b => b.Event.EventDate < today ||
+                           (b.Event.EventDate == today && b.Event.EndTime <= currentTime))
+                .ToList();
+
+            foreach (var booking in bookingsToUpdate)
+            {
+                booking.Status = "Completed";
+            }
+
+            return _bookingRepository.SaveUpdatedBookings(bookingsToUpdate);
+        }
+
+        public int UpdateBooking(int id, Booking booking)
+        {
+            return _bookingRepository.UpdateBooking(id, booking);
+        }
+
+
+        //Delete
+        public int DeleteBooking(int id)
+        {
+            return _bookingRepository.DeleteBooking(id);
         }
     }
 }
