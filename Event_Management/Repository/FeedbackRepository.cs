@@ -1,5 +1,6 @@
 ﻿using Event_Management.Data;
-//using Event_Management.Migrations;
+using Event_Management.DTOs;
+using Event_Management.Migrations;
 using Event_Management.Models;
 //using Humanizer;
 using Microsoft.EntityFrameworkCore;
@@ -17,9 +18,7 @@ namespace Event_Management.Repository
         
         public List<Feedback> GetAllFeedbacks()
         {
-
-               return _context.Feedback.Include(f => f.Event).Where(f=>f.IsArchived==false).ToList();
-            
+               return _context.Feedback.Where(f=>f.IsArchived==false).ToList();
         }
 
         public Feedback GetFeedbackById(int id)
@@ -31,48 +30,32 @@ namespace Event_Management.Repository
             return _context.Feedback.FirstOrDefault(s => s.FeedbackId == id);
         }
 
-        public int UpdateFeedback(int id, Feedback feedback)
-        {
-            var existingFeedback = _context.Feedback.FirstOrDefault(s => s.FeedbackId == id);
-
-            if (existingFeedback != null)
-            {
-                existingFeedback.Rating = feedback.Rating;
-                existingFeedback.Comments = feedback.Comments;
-            }
-            return _context.SaveChanges();
-
-        }
-
         public bool HasUserAttendedEvent(int userId, int eventId)
         {
             return _context.Booking
-                .Any(b => b.UserId == userId && b.EventId == eventId);
+                .Any(b => b.UserId == userId && b.EventId == eventId && b.Status=="Attended");
         }
         public bool HasUserAlreadySubmittedFeedback(int userId, int eventId)
         {
             return _context.Feedback.Any(f => f.UserId == userId && f.EventId == eventId);
         }
-        public int SubmitFeedback(Feedback feedback)
+        public int SubmitFeedback(CreateFeedbackDto feedbackDto)
         {
-            
-            var feed = new Feedback
+
+            var feedback = new Feedback
             {
-                UserId = feedback.UserId,
-                EventId = feedback.EventId,
-                Rating = feedback.Rating,
-                ContentQuality=feedback.ContentQuality,
-                VenueFacilities=feedback.VenueFacilities,
-                EventOrganization=feedback.EventOrganization,
-                ValueForMoney=feedback.ValueForMoney,
-                Comments = feedback.Comments,
-                SubmittedAt = DateTime.Now,
-                IsArchived=feedback.IsArchived,
-                Reply = null,
-                ReplyTime = null
+                EventId = feedbackDto.EventId,
+                UserId = feedbackDto.UserId,
+                Rating = feedbackDto.Rating,
+                ContentQuality = feedbackDto.ContentQuality,
+                VenueFacilities = feedbackDto.VenueFacilities,
+                EventOrganization = feedbackDto.EventOrganization,
+                ValueForMoney = feedbackDto.ValueForMoney,
+                Comments = feedbackDto.Comments,
+                SubmittedAt = DateTime.UtcNow // Use UtcNow
             };
 
-            _context.Feedback.Add(feed);
+            _context.Feedback.Add(feedback);
             return _context.SaveChanges();
             Console.WriteLine("Your feedback has been submitted successfully.");
 
@@ -118,7 +101,7 @@ namespace Event_Management.Repository
             var query = _context.Feedback.Include(f => f.Event).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(eventName))
-                query = query.Where(f => f.Event != null && f.Event.EventName == eventName);
+                query = query.Where(f => f.Event != null && f.Event.EventName.Contains(eventName));
 
             if (minRating.HasValue)
                 query = query.Where(f => f.Rating >= minRating.Value);
@@ -140,7 +123,7 @@ namespace Event_Management.Repository
             return _context.Replies.FirstOrDefault(s => s.FeedbackId == id);
         }
 
-        public int AddReply(int feedbackId,Replies replies)
+        public int AddReply(int feedbackId, ReplyDto replies)
         {
             var rep = new Replies
             {
@@ -158,9 +141,7 @@ namespace Event_Management.Repository
         }
         public int ArchiveFeedback(int feedbackId)
         {
-            var feed=_context.Feedback.FirstOrDefault(s => s.FeedbackId == feedbackId);
-            feed.IsArchived = true;
-            return _context.SaveChanges();
+            return _context.Database.ExecuteSqlRaw("EXEC ArchiveFeedbackById @FeedbackId = {0}",feedbackId);
         }
         public int UnArchiveFeedback(int feedbackId)
         {

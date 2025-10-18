@@ -1,9 +1,10 @@
-﻿using Event_Management.Exceptions;
-//using Event_Management.Migrations;
+﻿using Event_Management.DTOs;
+using Event_Management.Exceptions;
+using Event_Management.Migrations;
 using Event_Management.Models;
 using Event_Management.Repository;
-using Microsoft.EntityFrameworkCore;
 using EventFeedback.Exceptions;
+using Microsoft.EntityFrameworkCore;
 namespace Event_Management.Services
 {
     //services class is made to see if it is exception where to go and if not where to go
@@ -23,15 +24,7 @@ namespace Event_Management.Services
             return _repository.GetFeedbackById(id);
         }
         
-        public int UpdateFeedback(int id, Feedback feedback)
-        {
-            if (_repository.GetFeedbackById(id) == null)
-            {
-                throw new FeedbackNotFound($"Feedback with feedback id {id} does not exist");
-            }
-            return _repository.UpdateFeedback(id, feedback);
-        }
-        public int SubmitFeedback(Feedback feedback)
+        public int SubmitFeedback(CreateFeedbackDto feedback)
         {
             var hasAttended = _repository.HasUserAttendedEvent(feedback.UserId, feedback.EventId);
             if (_repository.HasUserAlreadySubmittedFeedback(feedback.UserId, feedback.EventId))
@@ -41,19 +34,6 @@ namespace Event_Management.Services
             if (!hasAttended)
             {
                 throw new InvalidOperationException("Feedback is available only after attending the event.");
-            }
-
-            if (feedback.Rating < 1 || feedback.ContentQuality < 1 ||
-                    feedback.VenueFacilities < 1 || feedback.EventOrganization < 1 ||
-                    feedback.ValueForMoney < 1)
-            {
-                throw new ArgumentException("All ratings must be at least 1.");
-            }
-
-
-            if (string.IsNullOrWhiteSpace(feedback.Comments))
-            {
-                throw new ArgumentException("Please enter some feedback.");
             }
 
             return _repository.SubmitFeedback(feedback);
@@ -94,7 +74,7 @@ namespace Event_Management.Services
         }
 
 
-        public int SubmitReply(int feedbackId, Replies reply)
+        public int SubmitReply(int feedbackId, ReplyDto reply)
         {
             var feedback = _repository.GetFeedbackById(feedbackId);
             if (feedback == null)

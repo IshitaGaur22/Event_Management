@@ -9,12 +9,17 @@ namespace Event_Management.Services
     {
         private readonly IBookingRepository _bookingRepository;
         private readonly IPaymentRepository _paymentRepository;
+        private readonly IEmailService _emailService;
 
-        public BookingService(IBookingRepository repo, IPaymentRepository paymentRepository)
+        public BookingService(IBookingRepository repo, IPaymentRepository paymentRepository, IEmailService emailService)
         {
             _bookingRepository = repo;
             _paymentRepository = paymentRepository;
+            _emailService = emailService;
         }
+       
+
+       
 
         
         //Post
@@ -30,22 +35,21 @@ namespace Event_Management.Services
 
             var booking = new Booking
             {
-                EventId = ev.EventID,
+                EventId = ticket.EventID,
                 UserId = user.UserId,
                 SelectedSeats = selectedSeats,
                 BookingDate = DateTime.Now,
-                Status = "Pending"
+                Status = "Confirmed"
             };
 
             ev.TotalSeats -= selectedSeats;
             _bookingRepository.UpdateEventSeats(ev);
             _bookingRepository.AddBooking(booking);
 
-            decimal amount = ev.PricePerTicket * selectedSeats;
-
+            decimal amount = ticket.PricePerTicket * selectedSeats;
             var payment = new Payment
             {
-                EventID = ev.EventID,
+                EventID = ticket.EventID,
                 BookingId = booking.BookingId,
                 Amount = amount,
                 //TotalAmount = amount,
@@ -56,13 +60,17 @@ namespace Event_Management.Services
 
             _paymentRepository.AddPayment(payment);
 
+            // ✅ Send Confirmation Email
+            var subject = "Booking Confirmation";
+            var body = $"Hi {user.UserName},\n\nYour booking for '{ticket.EventName}' on {ticket.EventDate} at {ticket.EventTime} is confirmed.\n\nThank you!";
+            _emailService.SendEmailAsync(user.Email, subject, body);
+
             return new BookingSummary
             {
-                EventName = ev.EventName,
-                Location = ev.Location,
-                EventDate = ev.EventDate,
-                Time = ev.EventTime,
-                PricePerTicket = ev.PricePerTicket,
+                EventName = ticket.EventName,
+                Location = ticket.Location,
+                Time = ticket.EventTime,
+                PricePerTicket = ticket.PricePerTicket,
                 SelectedSeats = selectedSeats,
                 TotalAmount = amount
             };
