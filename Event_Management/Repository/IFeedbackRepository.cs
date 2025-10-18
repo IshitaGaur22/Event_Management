@@ -14,7 +14,7 @@ namespace Event_Management.Repository
         bool HasUserAlreadySubmittedFeedback(int userId, int eventId);
         IEnumerable<object> GetTopRatedEvents();
         object GetFeedbackSummary(int eventId);
-        List<Feedback> GetFilteredFeedbacks(string? eventName,
+        IEnumerable<object> GetFilteredFeedbacks(string? eventName,
                     int? minRating,
                     DateTime? startDate,
                     DateTime? endDate,

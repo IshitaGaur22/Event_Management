@@ -9,7 +9,7 @@ namespace Event_Management.Services
         public int SubmitFeedback(CreateFeedbackDto feedback);
         IEnumerable<object> GetTopRatedEvents();
         object GetFeedbackSummary(int eventId);
-        public List<Feedback> GetFilteredFeedbacks(
+        public IEnumerable<object> GetFilteredFeedbacks(
                     string? eventName,
                     int? minRating,
                     DateTime? startDate,

@@ -35,7 +35,7 @@ namespace Event_Management.Services
 
             var booking = new Booking
             {
-                EventId = ticket.EventID,
+                EventId = eventId,
                 UserId = user.UserId,
                 SelectedSeats = selectedSeats,
                 BookingDate = DateTime.Now,
@@ -46,10 +46,10 @@ namespace Event_Management.Services
             _bookingRepository.UpdateEventSeats(ev);
             _bookingRepository.AddBooking(booking);
 
-            decimal amount = ticket.PricePerTicket * selectedSeats;
+            decimal amount = ev.PricePerTicket * selectedSeats;
             var payment = new Payment
             {
-                EventID = ticket.EventID,
+                EventID = ev.EventID,
                 BookingId = booking.BookingId,
                 Amount = amount,
                 //TotalAmount = amount,
@@ -62,15 +62,15 @@ namespace Event_Management.Services
 
             // ✅ Send Confirmation Email
             var subject = "Booking Confirmation";
-            var body = $"Hi {user.UserName},\n\nYour booking for '{ticket.EventName}' on {ticket.EventDate} at {ticket.EventTime} is confirmed.\n\nThank you!";
+            var body = $"Hi {user.UserName},\n\nYour booking for '{ev.EventName}' on {ev.EventDate} at {ev.EventTime} is confirmed.\n\nThank you!";
             _emailService.SendEmailAsync(user.Email, subject, body);
 
             return new BookingSummary
             {
-                EventName = ticket.EventName,
-                Location = ticket.Location,
-                Time = ticket.EventTime,
-                PricePerTicket = ticket.PricePerTicket,
+                EventName = ev.EventName,
+                Location = ev.Location,
+                Time = ev.EventTime,
+                PricePerTicket = ev.PricePerTicket,
                 SelectedSeats = selectedSeats,
                 TotalAmount = amount
             };

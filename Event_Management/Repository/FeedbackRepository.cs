@@ -2,12 +2,10 @@
 using Event_Management.DTOs;
 using Event_Management.Migrations;
 using Event_Management.Models;
-//using Humanizer;
 using Microsoft.EntityFrameworkCore;
 
 namespace Event_Management.Repository
 {
-    //repository folder is for logical part using c#
     public class FeedbackRepository : IFeedbackRepository
     {
         private readonly Event_ManagementContext _context;
@@ -52,7 +50,7 @@ namespace Event_Management.Repository
                 EventOrganization = feedbackDto.EventOrganization,
                 ValueForMoney = feedbackDto.ValueForMoney,
                 Comments = feedbackDto.Comments,
-                SubmittedAt = DateTime.UtcNow // Use UtcNow
+                SubmittedAt = DateTime.UtcNow 
             };
 
             _context.Feedback.Add(feedback);
@@ -91,14 +89,14 @@ namespace Event_Management.Repository
                 .FirstOrDefault();
             return summary ?? new { TotalFeedback = 0, AverageRating = 0.0 };
         }
-        public List<Feedback> GetFilteredFeedbacks(
+        public IEnumerable<object> GetFilteredFeedbacks(
                     string? eventName,
                     int? minRating,
                     DateTime? startDate,
                     DateTime? endDate,
                     string? search)
         {
-            var query = _context.Feedback.Include(f => f.Event).AsQueryable();
+            var query = _context.Feedback.Include(f => f.Event).Include(u=>u.User).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(eventName))
                 query = query.Where(f => f.Event != null && f.Event.EventName.Contains(eventName));
@@ -115,7 +113,22 @@ namespace Event_Management.Repository
             if (!string.IsNullOrWhiteSpace(search))
                 query = query.Where(f => f.Comments.Contains(search));
 
-            return query.ToList();
+            var result = query.Select(f => new
+            {
+                FeedbackId = f.FeedbackId,
+                EventName = f.Event.EventName,
+                UserName = f.User.UserName,
+                Rating = f.Rating,
+                ContentQuality=f.ContentQuality,
+                VenueFacilities=f.VenueFacilities,
+                EventOrganization=f.EventOrganization,
+                ValueForMoney=f.ValueForMoney,
+                Comments = f.Comments,
+                SubmittedAt = f.SubmittedAt,
+                Reply = f.Reply,
+                ReplyTime = f.ReplyTime
+            });
+            return result;
         }
 
         public Replies GetReplyById(int id)
