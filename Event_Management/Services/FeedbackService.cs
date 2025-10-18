@@ -54,7 +54,7 @@ namespace Event_Management.Services
         {
             return _repository.GetFeedbackSummary(eventId);
         }
-        public List<Feedback> GetFilteredFeedbacks(
+        public IEnumerable<object> GetFilteredFeedbacks(
                     string? eventName,
                     int? minRating,
                     DateTime? startDate,
@@ -65,7 +65,7 @@ namespace Event_Management.Services
         {
             var feedbackList = _repository.GetFilteredFeedbacks(eventName, minRating, startDate, endDate, search);
 
-            if (feedbackList == null || feedbackList.Count == 0)
+            if (feedbackList == null)
             {
                 throw new FeedbackNotFound("No feedbacks found for the given filters.");
             }

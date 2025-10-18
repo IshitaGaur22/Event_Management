@@ -538,7 +538,7 @@ namespace Event_Management.Migrations
                 {
                     b.HasOne("Event_Management.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryID")
+                        .HasForeignKey("CategoryID");
                     b.HasOne("Event_Management.Models.Feedback", "Feedback")
                         .WithMany()
                         .HasForeignKey("FeedbackId")
