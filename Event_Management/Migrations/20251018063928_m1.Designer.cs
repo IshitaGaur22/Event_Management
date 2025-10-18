@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Event_Management.Migrations
 {
     [DbContext(typeof(Event_ManagementContext))]
-    [Migration("20251015060416_feedbacktable")]
-    partial class Feedbacktable
+    [Migration("20251018063928_m1")]
+    partial class m1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,17 +46,12 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TicketId")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("BookingId");
 
                     b.HasIndex("EventId");
-
-                    b.HasIndex("TicketId");
 
                     b.HasIndex("UserId");
 
@@ -95,6 +90,9 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
                     b.Property<DateOnly>("EventDate")
                         .HasColumnType("date");
 
@@ -109,6 +107,12 @@ namespace Event_Management.Migrations
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PricePerTicket")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TotalSeats")
+                        .HasColumnType("int");
 
                     b.HasKey("EventID");
 
@@ -214,6 +218,9 @@ namespace Event_Management.Migrations
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
 
+                    b.Property<int>("EventID")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
@@ -225,40 +232,36 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TicketId")
-                        .HasColumnType("int");
-
                     b.HasKey("PaymentId");
 
                     b.HasIndex("BookingId");
 
-                    b.HasIndex("TicketId");
-
                     b.ToTable("Payment");
                 });
 
-            modelBuilder.Entity("Event_Management.Models.Ticket", b =>
+            modelBuilder.Entity("Event_Management.Models.Replies", b =>
                 {
-                    b.Property<int>("TicketID")
+                    b.Property<int>("ReplyId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReplyId"));
 
-                    b.Property<int>("EventId")
+                    b.Property<int>("FeedbackId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("PricePerTicket")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("ReplyText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TotalSeats")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("ReplyTime")
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("TicketID");
+                    b.HasKey("ReplyId");
 
-                    b.HasIndex("EventId");
+                    b.HasIndex("FeedbackId");
 
-                    b.ToTable("Ticket");
+                    b.ToTable("Replies");
                 });
 
             modelBuilder.Entity("Event_Management.Models.User", b =>
@@ -286,12 +289,6 @@ namespace Event_Management.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Event_Management.Models.Ticket", "Ticket")
-                        .WithMany()
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Event_Management.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -299,8 +296,6 @@ namespace Event_Management.Migrations
                         .IsRequired();
 
                     b.Navigation("Event");
-
-                    b.Navigation("Ticket");
 
                     b.Navigation("User");
                 });
@@ -343,31 +338,18 @@ namespace Event_Management.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Event_Management.Models.Ticket", "Ticket")
-                        .WithMany()
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Booking");
-
-                    b.Navigation("Ticket");
                 });
 
-            modelBuilder.Entity("Event_Management.Models.Ticket", b =>
+            modelBuilder.Entity("Event_Management.Models.Replies", b =>
                 {
-                    b.HasOne("Event_Management.Models.Event", "Event")
-                        .WithMany("Tickets")
-                        .HasForeignKey("EventId")
+                    b.HasOne("Event_Management.Models.Feedback", "Feedback")
+                        .WithMany()
+                        .HasForeignKey("FeedbackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Event");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Event", b =>
-                {
-                    b.Navigation("Tickets");
+                    b.Navigation("Feedback");
                 });
 #pragma warning restore 612, 618
         }
