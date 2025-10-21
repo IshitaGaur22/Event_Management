@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Event_Management.Migrations
 {
     /// <inheritdoc />
-    public partial class Create : Migration
+    public partial class Event : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,13 +25,36 @@ namespace Event_Management.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EventRevenueDto",
+                columns: table => new
+                {
+                    EventID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EventDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TotalSeats = table.Column<int>(type: "int", nullable: false),
+                    PricePerTicket = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EstimatedRevenue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ActualRevenue = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventRevenueDto", x => x.EventID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    UserName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<long>(type: "bigint", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -46,12 +69,13 @@ namespace Event_Management.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EventName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EventDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    EventTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CategoryID = table.Column<int>(type: "int", nullable: false),
                     TotalSeats = table.Column<int>(type: "int", nullable: false),
-                    PricePerTicket = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    PricePerTicket = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EventDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    EventTime = table.Column<TimeOnly>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeOnly>(type: "time", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -240,6 +264,9 @@ namespace Event_Management.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "EventRevenueDto");
+
             migrationBuilder.DropTable(
                 name: "Notification");
 

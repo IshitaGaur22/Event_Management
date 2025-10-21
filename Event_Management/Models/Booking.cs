@@ -24,7 +24,7 @@ namespace Event_Management.Models
         public DateTime BookingDate { get; set; }
 
         [Required]
-        public string Status { get; set; } = "Confirmed"; // Default before payment
+        public string Status { get; set; } = "Successful"; // Default before payment
 
         //public virtual Ticket Ticket { get; set; }
         public virtual Event Event { get; set; }

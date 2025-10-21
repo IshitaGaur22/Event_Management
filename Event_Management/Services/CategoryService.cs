@@ -12,10 +12,11 @@ namespace Event_Management.Services
         {
             repository = repo;
         }
+        
         public int CreateCategories(Category c)
         {
-            if (repository.GetCategoryById(c.CategoryID) != null)
-                throw new CategoryAlreadyExistsException(c.CategoryID);
+            if (repository.GetCategory(c.CategoryName) ==1)
+                throw new CategoryAlreadyExistsException(c.CategoryName);
 
             try
             {

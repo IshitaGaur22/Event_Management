@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Event_Management.Data;
+﻿using Event_Management.Data;
+using Event_Management.DTOs;
 using Event_Management.Exceptions;
 using Event_Management.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -20,16 +21,44 @@ namespace Event_Management.Repository
         public int AddEvent(Event ev)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventName == ev.EventName);
+
+            
+            var categoryExists = context.Category.Any(c => c.CategoryID == ev.CategoryID);
+            if (!categoryExists)
+            {
+                throw new CategoryNotFoundException();
+            }
+
+            
             if (evt != null)
             {
                 return 0;
             }
+
             context.Event.Add(ev);
             return context.SaveChanges();
         }
+
         public int GetTotalEvents()
         {
             return context.Event.Count();
+        }
+        public int GetTotalBookings()
+        {
+            return context.Booking.Count();
+        }
+
+        public decimal GetTotalRevenue()
+        {
+            return context.Booking
+                .Include(b => b.Event)
+                .Where(b => b.Event != null)
+                .Sum(b => b.SelectedSeats * b.Event.PricePerTicket);
+        }
+
+        public int GetTotalNoOfUsers()
+        {
+            return context.User.Count();
         }
 
         public Event GetEventbyId(int ticketId)
@@ -40,18 +69,37 @@ namespace Event_Management.Repository
             return evt;
         }
 
-        public IEnumerable<Event> GetAllTickets() => context.Event.ToList();
+        public List<EventRevenueDto> GetEventRevenueSummary()
+        {
+            return context.EventRevenueDto
+                .FromSqlRaw("EXEC GetEventRevenueSummary")
+                .ToList();
+        }
+
+
+        //public IEnumerable<Event> GetAllTickets() => context.Event.ToList();
+
+        //public void Delete(string eventName)
+        //{
+        //    var evt = context.Event.FirstOrDefault(e => e.EventName == eventName);
+
+
+        //    context.Event.Remove(evt);
+        //    context.SaveChanges();
+        //}
 
         public void Delete(string eventName)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventName == eventName);
-
+            if (evt == null)
+                throw new EventsNotFoundException(eventName); 
 
             context.Event.Remove(evt);
             context.SaveChanges();
         }
 
-        public int UpdateEvent(int id, string? name, string? description, DateOnly? date, TimeOnly? time, string? location)
+
+        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventID == id);
             if (evt == null)
@@ -72,12 +120,21 @@ namespace Event_Management.Repository
             if (!string.IsNullOrWhiteSpace(location))
                 evt.Location = location;
 
+            if (endTime.HasValue)
+                evt.EndTime = endTime.Value;
+
+            if (TotalSeats>0)
+                evt.TotalSeats = TotalSeats;
+            if (PricePerTicket>0)
+                evt.PricePerTicket = PricePerTicket;
+
+          
             context.Event.Update(evt);
             return context.SaveChanges();
         }
 
         public Event GetEventByName(string eventName) =>
-    context.Event.Single(e =>
+    context.Event.SingleOrDefault(e =>
         e.EventName==eventName);
 
         public List<Event> GetEventById(int id) => context.Event

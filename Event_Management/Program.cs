@@ -30,42 +30,51 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:UserWebAPI"],
-        ValidAudience = builder.Configuration["Jwt:EventManagementUser"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-    };
+    //options.InvalidModelStateResponseFactory = context =>
+    //{
+
+    //    if (!context.ModelState.IsValid &&
+    //        context.ModelState.Values.All(v => v.Errors.Count > 0))
+    //    {
+    //        return new BadRequestObjectResult(new
+    //        {
+    //            error = "Value have not been entered, please enter values."
+    //        });
+    //    }
+
+    //    return new BadRequestObjectResult(new
+    //    {
+    //        error = "Invalid model state.",
+    //        details = context.ModelState
+    //    });
+    //};
+
+
+
 });
 
 
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.InvalidModelStateResponseFactory = context =>
-    {
-        
-        if (!context.ModelState.IsValid &&
-            context.ModelState.Values.All(v => v.Errors.Count > 0))
-        {
-            return new BadRequestObjectResult(new
-            {
-                error = "Value have not been entered, please enter values."
-            });
-        }
+//builder.Services.Configure<ApiBehaviorOptions>(options =>
+//{
+//    options.InvalidModelStateResponseFactory = context =>
+//    {
 
-        return new BadRequestObjectResult(new
-        {
-            error = "Invalid model state.",
-            details = context.ModelState
-        });
-    };
-});
-builder.Services.AddScoped<ITokenService, TokenService>();
+//        if (!context.ModelState.IsValid &&
+//            context.ModelState.Values.All(v => v.Errors.Count > 0))
+//        {
+//            return new BadRequestObjectResult(new
+//            {
+//                error = "Value has not been entered, please enter values."
+//            });
+//        }
+
+//        return new BadRequestObjectResult(new
+//        {
+//            error = "Invalid model state.",
+//            details = context.ModelState
+//        });
+//    };
+//});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
