@@ -114,9 +114,6 @@ namespace Event_Management.Services
             return eventDetails;
         }
 
-
-
-
         public List<Event> FetchEventLocation(string location)
         {
             var eventDetails = repository.GetEventByLocation(location);
