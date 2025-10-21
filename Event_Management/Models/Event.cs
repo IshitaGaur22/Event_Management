@@ -1,7 +1,5 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace Event_Management.Models
 {
@@ -20,8 +18,6 @@ namespace Event_Management.Models
 
         [Required(ErrorMessage = "Please Choose a category.")]
         public int CategoryID { get; set; }
-        [JsonIgnore]
-        public Category Category { get; set; }
 
         [Required]
         public int TotalSeats { get; set; }
