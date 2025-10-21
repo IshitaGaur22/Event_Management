@@ -5,7 +5,7 @@ using Event_Management.ExceptionHandlers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
-using Event_Management.Data;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,24 +20,43 @@ builder.Services.AddControllers()
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
+    //options.InvalidModelStateResponseFactory = context =>
+    //{
+
+    //    if (!context.ModelState.IsValid &&
+    //        context.ModelState.Values.All(v => v.Errors.Count > 0))
+    //    {
+    //        return new BadRequestObjectResult(new
+    //        {
+    //            error = "Value have not been entered, please enter values."
+    //        });
+    //    }
+
+    //    return new BadRequestObjectResult(new
+    //    {
+    //        error = "Invalid model state.",
+    //        details = context.ModelState
+    //    });
+    //};
+
     options.InvalidModelStateResponseFactory = context =>
     {
-        
-        if (!context.ModelState.IsValid &&
-            context.ModelState.Values.All(v => v.Errors.Count > 0))
-        {
-            return new BadRequestObjectResult(new
+        var errors = context.ModelState
+            .Where(e => e.Value.Errors.Count > 0)
+            .Select(e => new
             {
-                error = "Value have not been entered, please enter values."
+                Field = e.Key,
+                Messages = e.Value.Errors.Select(err => err.ErrorMessage).ToArray()
             });
-        }
 
         return new BadRequestObjectResult(new
         {
-            error = "Invalid model state.",
-            details = context.ModelState
+            error = "Validation failed.",
+            details = errors
         });
     };
+
+
 });
 
 builder.Services.AddEndpointsApiExplorer();

@@ -1,4 +1,5 @@
-﻿using Event_Management.Exceptions;
+﻿using Event_Management.DTOs;
+using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Repository;
 
@@ -16,18 +17,23 @@ namespace Event_Management.Services
 
         public int CreateEvent(Event ev)
         {
-            if (repository.GetEvent(ev.EventName) == 1) 
+            if (repository.GetEvent(ev.EventName) == 1)
                 throw new EventAlreadyExistsException(ev.EventName);
 
             try
             {
                 return repository.AddEvent(ev);
             }
+            catch (CategoryNotFoundException)
+            {
+                throw new CategoryNotFoundException(); 
+            }
             catch (Exception ex)
             {
                 throw new EventCreationException(ex.Message);
             }
         }
+
 
         public Event GetEventbyId(int id)
         {
@@ -36,7 +42,12 @@ namespace Event_Management.Services
                 throw new TicketNotFoundException(id);
             return ticket;
         }
-        public IEnumerable<Event> GetAllTickets() => repository.GetAllTickets();
+        //public IEnumerable<Event> GetAllTickets() => repository.GetAllTickets();
+
+        public List<EventRevenueDto> GetEventRevenueSummary()
+        {
+            return repository.GetEventRevenueSummary();
+        }
 
 
         public void Delete(string eventName)
@@ -57,12 +68,26 @@ namespace Event_Management.Services
         {
             return repository.GetTotalEvents();
         }
-        
-        public int UpdateEvent(int id, string? name, string? description, DateOnly? date, TimeOnly? time, string? location)
+        public int GetTotalBookings()
+        {
+            return repository.GetTotalBookings();
+        }
+
+        public decimal GetTotalRevenue()
+        {
+            return repository.GetTotalRevenue();
+        }
+        public int GetTotalNoOfUsers()
+        {
+            return repository.GetTotalNoOfUsers();
+        }
+
+
+        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket,DateOnly? date, TimeOnly? time,  TimeOnly? endTime)
         {
             try
             {
-                var result = repository.UpdateEvent(id, name, description, date, time, location);
+                var result = repository.UpdateEvent(id, name, description, location, TotalSeats, PricePerTicket, date, time, endTime);
                 if (result == 0)
                     throw new EventUpdateException($"Event with ID {id} not found.");
                 return result;

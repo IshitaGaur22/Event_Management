@@ -41,7 +41,6 @@ namespace Event_Management.Controllers
             if (cat == null)
                 return BadRequest("No values entered, please enter values.");
 
-
             try
             {
                 _service.CreateCategories(cat);
@@ -64,6 +63,10 @@ namespace Event_Management.Controllers
             try
             {
                 var c = _service.GetAllCategories();
+                if(!c.Any())
+                {
+                    return Ok("No Categories Found");
+                }
                 return Ok(c);
             }
             catch (CategoryNotFoundException ex)

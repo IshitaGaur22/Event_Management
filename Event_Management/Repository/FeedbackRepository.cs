@@ -1,5 +1,5 @@
 ﻿using Event_Management.Data;
-using Event_Management.Migrations;
+//using Event_Management.Migrations;
 using Event_Management.Models;
 //using Humanizer;
 using Microsoft.EntityFrameworkCore;
