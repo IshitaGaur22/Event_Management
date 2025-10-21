@@ -9,6 +9,7 @@ namespace Event_Management.Repository
         public IEnumerable<Category> GetAllCategories();
         public void UpdateCategoryDetails(Category c);
 
+        public int GetCategory(string categoryName);
         public void DeleteCategory(int CategoryId);
     }
 }
