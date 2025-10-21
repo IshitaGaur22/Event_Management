@@ -2,8 +2,8 @@ using Event_Management.DTOs;
 using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Repository;
- 
- 
+
+
 namespace Event_Management.Services
 {
     public class EventService : IEventService
@@ -112,6 +112,9 @@ namespace Event_Management.Services
  
             return eventDetails;
         }
+
+
+
 
         public List<Event> FetchEventLocation(string location)
         {

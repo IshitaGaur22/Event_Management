@@ -16,8 +16,10 @@ namespace Event_Management.Models
         [Required(ErrorMessage = "Location is required.")]
         public string Location { get; set; }
 
+        [ForeignKey(nameof(Event))]
         [Required(ErrorMessage = "Please Choose a category.")]
         public int CategoryID { get; set; }
+        public Category Category { get; set; }
 
         [Required]
         public int TotalSeats { get; set; }

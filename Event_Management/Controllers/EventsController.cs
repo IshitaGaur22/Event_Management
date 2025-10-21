@@ -259,8 +259,15 @@ namespace Event_Management.Controllers
         [ProducesResponseType(typeof(IEnumerable<EventRevenueDto>), 200)]
         public IActionResult GetEventRevenueSummary()
         {
-            var eventSummary=service.GetEventRevenueSummary();
-            return Ok(eventSummary);
+            try
+            {
+                var eventSummary = service.GetEventRevenueSummary();
+                return Ok(eventSummary);
+            }
+            catch (EventsNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
         }
 
 
@@ -277,11 +284,11 @@ namespace Event_Management.Controllers
                 return Ok($"{eventName} Event deleted successfully.");
 
             }
-            catch (EventsNotFoundException ex)
-            {
-                return NotFound(new { error = ex.Message });
+                catch (EventsNotFoundException ex)
+                {
+                    return NotFound(new { error = ex.Message });
+                }
             }
-        }
 
 
     }
