@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Event_Management.Models
@@ -16,10 +18,8 @@ namespace Event_Management.Models
         [Required(ErrorMessage = "Location is required.")]
         public string Location { get; set; }
 
-        [ForeignKey(nameof(Event))]
         [Required(ErrorMessage = "Please Choose a category.")]
         public int CategoryID { get; set; }
-        public Category Category { get; set; }
 
         [Required]
         public int TotalSeats { get; set; }
@@ -65,13 +65,26 @@ namespace Event_Management.Models
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value is TimeOnly time)
+            if (value is not TimeOnly time)
+                return ValidationResult.Success;
+
+            var instance = validationContext.ObjectInstance;
+            var type = validationContext.ObjectType;
+            var dateProp = type.GetProperty("EventDate");
+
+            if (dateProp == null || dateProp.GetValue(instance) is not DateOnly eventDate)
+                return ValidationResult.Success;
+
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var now = TimeOnly.FromDateTime(DateTime.Now);
+            var nextHour = now.AddHours(1);
+
+            // If the event is today, time must be at least one hour ahead
+            if (eventDate == today && time < nextHour)
             {
-                var now = TimeOnly.FromDateTime(DateTime.Now);
-                var nextHour = now.AddHours(1);
-                if (time < nextHour)
-                    return new ValidationResult("Start time must be at least one hour from now.");
+                return new ValidationResult("Start time must be at least one hour from now.");
             }
+
             return ValidationResult.Success;
         }
     }
