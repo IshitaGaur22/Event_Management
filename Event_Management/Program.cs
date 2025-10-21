@@ -1,10 +1,16 @@
 ﻿using Event_Management.Data;
+using Event_Management.Data;
+using Event_Management.ExceptionHandlers;
+using Event_Management.Exceptions;
 using Event_Management.Repository;
 using Event_Management.Services;
-using Event_Management.ExceptionHandlers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using Event_Management.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 
@@ -17,8 +23,12 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-
-builder.Services.Configure<ApiBehaviorOptions>(options =>
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
 {
     //options.InvalidModelStateResponseFactory = context =>
     //{
@@ -59,6 +69,29 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 });
 
+
+//builder.Services.Configure<ApiBehaviorOptions>(options =>
+//{
+//    options.InvalidModelStateResponseFactory = context =>
+//    {
+
+//        if (!context.ModelState.IsValid &&
+//            context.ModelState.Values.All(v => v.Errors.Count > 0))
+//        {
+//            return new BadRequestObjectResult(new
+//            {
+//                error = "Value has not been entered, please enter values."
+//            });
+//        }
+
+//        return new BadRequestObjectResult(new
+//        {
+//            error = "Invalid model state.",
+//            details = context.ModelState
+//        });
+//    };
+//});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -75,14 +108,22 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 
-//builder.Services.AddScoped<IUserRepository, UserRepository>();
-//builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+
+builder.Services.AddScoped<IBookingHistoryRepository, BookingHistoryRepository>();
+builder.Services.AddScoped<IBookingHistoryService, BookingHistoryService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 var app = builder.Build();
 
@@ -97,6 +138,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 
 app.Run();

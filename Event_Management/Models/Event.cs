@@ -1,11 +1,11 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Event_Management.Models
 {
-    public class Event : IValidatableObject
+
+    public class Event:IValidateObject
     {
         [Key]
         public int EventID { get; set; }
@@ -15,14 +15,14 @@ namespace Event_Management.Models
 
         public string Description { get; set; }
 
+
         [Required(ErrorMessage = "Location is required.")]
         public string Location { get; set; }
 
         [Required(ErrorMessage = "Please Choose a category.")]
         public int CategoryID { get; set; }
-        [JsonIgnore]
-        public Category Category { get; set; }
 
+        public Category Category { get; set; }
         [Required]
         public int TotalSeats { get; set; }
 
@@ -32,7 +32,7 @@ namespace Event_Management.Models
         [Required(ErrorMessage = "Please enter a valid date.")]
         [FutureOrTodayDate]
         public DateOnly EventDate { get; set; }
-
+      
         [Required(ErrorMessage = "Please enter a valid time.")]
         [FutureTime]
         public TimeOnly EventTime { get; set; }
