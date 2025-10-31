@@ -1,6 +1,8 @@
-﻿using Event_Management.Models;
+﻿using Event_Management.Data;
+using Event_Management.DTOs;
+using Event_Management.Exceptions;
+using Event_Management.Models;
 using Event_Management.Services;
-using Event_Management.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -97,16 +99,47 @@ namespace Event_Management.Controllers
                 return NotFound("No bookings found.");
             return Ok(topEvents);
         }
+        [HttpGet("payment/{bookingId}")]
+        public IActionResult GetPaymentByBooking(int bookingId)
+        {
+            var payment = _bookingService.GetPaymentByBookingId(bookingId);
+
+            if (payment == null)
+                return NotFound($"No payment found for booking ID {bookingId}.");
+
+            return Ok(payment);
+        }
 
         //Put
 
         [HttpPut("bookingId")]
-        public IActionResult UpdateBooking(int id, [FromBody] Booking booking)
+        //public IActionResult UpdateBooking(int id, [FromBody] Booking booking)
+        //{
+        //    var result = _bookingService.UpdateBooking(id, booking);
+        //    if (result == 0)
+        //        return NotFound("Booking Not Found.");
+        //    return Ok("Booking updated succesfully.");
+        //}
+        public IActionResult UpdateBooking(int id, [FromBody] UpdateBookingDto bookingDto)
         {
-            var result = _bookingService.UpdateBooking(id, booking);
-            if (result == 0)
-                return NotFound("Booking Not Found.");
-            return Ok("Booking updated succesfully.");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                _bookingService.UpdateBooking(id, bookingDto);
+                return NoContent(); 
+            }
+            catch (BookingNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (SeatsUnavailableException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpPut("update-completed-bookings")]

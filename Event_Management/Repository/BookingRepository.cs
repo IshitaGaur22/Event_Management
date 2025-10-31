@@ -3,6 +3,7 @@ using Event_Management.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 using Event_Management.Exceptions;
+using Event_Management.DTOs;
 
 namespace Event_Management.Repository
 {
@@ -86,21 +87,29 @@ namespace Event_Management.Repository
             _context.Event.Update(ticket);
             _context.SaveChanges();
         }
-        public int UpdateBooking(int id, Booking booking)
-        {
-            var existing = _context.Booking.Find(id);
-            if (existing == null)
-                return 0;
-            existing.SelectedSeats = booking.SelectedSeats;
-            existing.BookingDate = booking.BookingDate;
-            existing.EventId = booking.EventId;
-            existing.UserId = booking.UserId;
+        //public int UpdateBooking(int id, Booking booking)
+        //{
+        //    var existing = _context.Booking.Find(id);
+        //    if (existing == null)
+        //        return 0;
+        //    existing.SelectedSeats = booking.SelectedSeats;
+        //    existing.BookingDate = booking.BookingDate;
+        //    existing.EventId = booking.EventId;
+        //    existing.UserId = booking.UserId;
 
-            return _context.SaveChanges();
-        }
-        void IBookingRepository.UpdateBooking(Booking booking)
+        //    return _context.SaveChanges();
+        //}
+        public void UpdateBooking(Booking booking)
         {
-            throw new NotImplementedException();
+            _context.Booking.Update(booking);
+            _context.SaveChanges();
+        }
+        void IBookingRepository.UpdateBooking(int id, UpdateBookingDto bookingDto)
+        {
+            var existingBooking = _context.Booking.Find(id);
+            existingBooking.SelectedSeats = bookingDto.SelectedSeats;
+            _context.Booking.Update(existingBooking);
+            _context.SaveChanges();
         }
 
         public void UpdateEventSeats(Event ev)
@@ -124,5 +133,6 @@ namespace Event_Management.Repository
             _context.Booking.Remove(booking);
             return _context.SaveChanges();
         }
+
     }
 }

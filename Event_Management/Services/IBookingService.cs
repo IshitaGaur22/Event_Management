@@ -5,8 +5,6 @@ namespace Event_Management.Services
 {
     public interface IBookingService
     {
-
-
         //Post
         BookingSummary AddBooking(int selectedSeats, string userName, int eventId);
 
@@ -23,7 +21,8 @@ namespace Event_Management.Services
         Payment GetPaymentByBookingId(int bookingId);
 
         //Put
-        int UpdateBooking(int id, Booking booking);
+        //int UpdateBooking(int id, Booking booking);
+        void UpdateBooking(int id, UpdateBookingDto bookingDto);
         int UpdateCompletedBookings();
 
         //Delete

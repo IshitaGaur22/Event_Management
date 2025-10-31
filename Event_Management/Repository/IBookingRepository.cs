@@ -1,4 +1,5 @@
-﻿using Event_Management.Models;
+﻿using Event_Management.DTOs;
+using Event_Management.Models;
 
 namespace Event_Management.Repository
 {
@@ -13,7 +14,6 @@ namespace Event_Management.Repository
         Event GetLatestTicket();
         Event GetEventById(int eventId);
         User GetUserByUsername(string username);
-        void UpdateBooking(Booking booking);
         IEnumerable<Booking> GetBookingByName(string username);
         object GetSeats(int id);
         IEnumerable<Booking> GetBookingsByEvent(int eventId);
@@ -25,7 +25,9 @@ namespace Event_Management.Repository
         //Put
         void UpdateTicket(Event ticket);
         void UpdateEventSeats(Event ev);
-        int UpdateBooking(int id, Booking booking);
+        void UpdateBooking(Booking booking);
+        //int UpdateBooking(int id, Booking booking);
+        void UpdateBooking(int id, UpdateBookingDto bookingDto);
         int SaveUpdatedBookings(IEnumerable<Booking> bookings);
 
         //Delete

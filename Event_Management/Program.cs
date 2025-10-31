@@ -1,13 +1,9 @@
 ﻿using Event_Management.Data;
-using Event_Management.Data;
-using Event_Management.ExceptionHandlers;
 using Event_Management.Exceptions;
 using Event_Management.Repository;
 using Event_Management.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
-using Event_Management.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -81,6 +77,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddHostedService<BookingStatusUpdater>();
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
