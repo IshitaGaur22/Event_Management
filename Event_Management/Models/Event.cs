@@ -1,16 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Drawing;
+using System.Text.Json.Serialization;
 
 namespace Event_Management.Models
-
 {
 
-    public class Event
+    public class Event:IValidateObject
     {
-
         [Key]
-
         public int EventID { get; set; }
 
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Event name must be at least 3 characters.")]
@@ -35,14 +32,13 @@ namespace Event_Management.Models
         [Required(ErrorMessage = "Please enter a valid date.")]
         [FutureOrTodayDate]
         public DateOnly EventDate { get; set; }
-
-
+      
         [Required(ErrorMessage = "Please enter a valid time.")]
         [FutureTime]
         public TimeOnly EventTime { get; set; }
 
 
-        [Required(ErrorMessage = "Enter End Time")]
+        [Required(ErrorMessage = "End Time should be taken after the start time")]
         public TimeOnly? EndTime { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -82,5 +78,4 @@ namespace Event_Management.Models
             return ValidationResult.Success;
         }
     }
-
 }

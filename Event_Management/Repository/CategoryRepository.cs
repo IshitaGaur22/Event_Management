@@ -28,6 +28,12 @@ namespace Event_Management.Repository
 
         public IEnumerable<Category> GetAllCategories() => context.Category.ToList();
 
+        public int GetCategory(string categoryName)
+        {
+            var cat = context.Category.FirstOrDefault(e => e.CategoryName == categoryName);
+            return cat != null ? 1 : 0;
+        }
+
         public void UpdateCategoryDetails(Category c)
         {
             var existingTicket = context.Category.Find(c.CategoryID);
