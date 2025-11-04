@@ -5,6 +5,8 @@ using Event_Management.Repository;
 using Microsoft.AspNetCore.Identity.Data;
 using Org.BouncyCastle.Crypto.Generators;
 using BCrypt;
+using Event_Management.Auth;
+using System.Security.Authentication;
 
 namespace Event_Management.Services
 {
@@ -38,20 +40,23 @@ namespace Event_Management.Services
             return "User registered successfully";
         }
 
-        public async Task<string> LoginAsync(LoginDto dto)
+        public async Task<LoginResponse> LoginAsync(LoginDto dto)
         {
             var user = await _usersRepository.GetUserByEmailAsync(dto.Email);
 
             if (user == null)
-                return "Invalid email";
+                throw new InvalidCredentialException("Invalid email");
 
             if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-                return "Invalid password";
+                throw new InvalidCredentialException("Invalid password");
 
-            if (!string.IsNullOrEmpty(dto.Role) && user.Role != dto.Role)
-                return "Invalid role";
-
-            return _tokenService.CreateToken(user);
+            
+            var token= _tokenService.CreateToken(user);
+            return new LoginResponse
+            {
+                Token = token,
+                Role = user.Role
+            };
         }
 
         public async Task<bool> ValidateLoginAsync(LoginDto dto)
@@ -70,10 +75,7 @@ namespace Event_Management.Services
             await _usersRepository.UpdateUserAsync(user);
         }
 
-        public Task<string> LoginAsync(LoginRequest request)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public Task<string> RegisterAsync(User user)
         {
