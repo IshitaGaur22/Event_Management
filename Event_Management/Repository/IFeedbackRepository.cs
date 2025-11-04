@@ -18,7 +18,9 @@ namespace Event_Management.Repository
                     int? minRating,
                     DateTime? startDate,
                     DateTime? endDate,
-                    string? search);
+                    string? search,
+                    SortByOptions sortBy,
+                    SortOrderOptions sortOrder);
         Replies GetReplyById(int id);
         int AddReply(int feedbckId, ReplyDto reply);
         int ArchiveFeedback(int feedbackId);

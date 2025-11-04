@@ -24,7 +24,7 @@ namespace Event_Management.Models
 
         [Required(ErrorMessage = "Please Choose a category.")]
         public int CategoryID { get; set; }
-
+        [ForeignKey("CategoryID")]
         public Category Category { get; set; }
         [Required]
         public int TotalSeats { get; set; }
@@ -43,7 +43,7 @@ namespace Event_Management.Models
 
 
         [Required(ErrorMessage = "Enter End Time")]
-        public TimeOnly EndTime { get; set; }
+        public TimeOnly? EndTime { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
