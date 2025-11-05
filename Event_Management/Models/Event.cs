@@ -37,7 +37,7 @@ namespace Event_Management.Models
             [Required(ErrorMessage = "Please Choose a category.")]
             public int CategoryID { get; set; }
 
-            //public Category Category { get; set; }
+        //public Category Category { get; set; }
             [Required]
             public int TotalSeats { get; set; }
 

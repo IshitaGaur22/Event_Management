@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Event_Management.Migrations
 {
     /// <inheritdoc />
-    public partial class User : Migration
+    public partial class events : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,26 +22,6 @@ namespace Event_Management.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Category", x => x.CategoryID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Event",
-                columns: table => new
-                {
-                    EventID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EventName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EventDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    EventTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CategoryID = table.Column<int>(type: "int", nullable: false),
-                    TotalSeats = table.Column<int>(type: "int", nullable: false),
-                    PricePerTicket = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Event", x => x.EventID);
                 });
 
             migrationBuilder.CreateTable(
@@ -77,6 +57,32 @@ namespace Event_Management.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_User", x => x.UserId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Event",
+                columns: table => new
+                {
+                    EventID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EventDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    EventTime = table.Column<TimeOnly>(type: "time", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CategoryID = table.Column<int>(type: "int", nullable: false),
+                    TotalSeats = table.Column<int>(type: "int", nullable: false),
+                    PricePerTicket = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Event", x => x.EventID);
+                    table.ForeignKey(
+                        name: "FK_Event_Category_CategoryID",
+                        column: x => x.CategoryID,
+                        principalTable: "Category",
+                        principalColumn: "CategoryID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -200,6 +206,11 @@ namespace Event_Management.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Event_CategoryID",
+                table: "Event",
+                column: "CategoryID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Feedback_EventId",
                 table: "Feedback",
                 column: "EventId");
@@ -224,9 +235,6 @@ namespace Event_Management.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Category");
-
-            migrationBuilder.DropTable(
                 name: "Notification");
 
             migrationBuilder.DropTable(
@@ -246,6 +254,9 @@ namespace Event_Management.Migrations
 
             migrationBuilder.DropTable(
                 name: "User");
+
+            migrationBuilder.DropTable(
+                name: "Category");
         }
     }
 }
