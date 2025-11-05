@@ -1,4 +1,5 @@
-﻿using Event_Management.Exceptions;
+﻿using Event_Management.DTOs;
+using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,10 @@ namespace Event_Management.Controllers
                 service.CreateEvent(events);
                 return StatusCode(201, new { message = "Event created successfully." });
             }
+            catch (CategoryNotFoundException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
             catch (EventAlreadyExistsException ex)
             {
                 return Conflict(new { error = ex.Message });
@@ -47,16 +52,21 @@ namespace Event_Management.Controllers
     [FromQuery] int id,
     [FromQuery] string? name,
     [FromQuery] string? description,
+    [FromQuery] string? location,
+    [FromQuery] int TotalSeats,
+    [FromQuery] decimal PricePerTicket,
     [FromQuery] DateOnly? date,
     [FromQuery] TimeOnly? time,
-    [FromQuery] string? location)
+    
+    [FromQuery]TimeOnly? endTime
+    )
         {
             if (name == null && description == null && date == null && time == null && location == null)
                 return BadRequest("No fields provided to update.");
 
             try
             {
-                service.UpdateEvent(id, name, description, date, time, location);
+                service.UpdateEvent(id, name, description, location, TotalSeats, PricePerTicket,date, time,endTime);
                 return Ok("Event updated successfully.");
             }
             catch (EventUpdateException ex)
@@ -74,7 +84,7 @@ namespace Event_Management.Controllers
             }
         }
 
-        [HttpGet("total-Events")]
+        [HttpGet("Total Number Of Events")]
         [ProducesResponseType(typeof(IEnumerable<Event>), 200)]
         public IActionResult GetTotalNumberOfEvents()
         {
@@ -88,20 +98,91 @@ namespace Event_Management.Controllers
                 return NotFound(new { error = ex.Message });
             }
         }
-        [HttpGet]
+
+        [HttpGet("Total Number Of Bookings")]
+        [ProducesResponseType(typeof(IEnumerable<Booking>), 200)]
+        public IActionResult GetTotalBookings()
+        {
+            //try
+            //{
+                var totalBookings = service.GetTotalBookings();
+                return Ok(totalBookings);
+            //}
+            //catch(BookingsNotFoundException ex)
+            //{
+            //    return NotFound(new { error = ex.Message });
+            //}
+        }
+        [HttpGet("Total Revenue Generated")]
+        [ProducesResponseType(typeof(IEnumerable<Payment>), 200)]
+        public IActionResult GetTotalRevenue()
+        {
+            //try
+            //{
+            var totalRevenue = service.GetTotalBookings();
+            return Ok(totalRevenue);
+            //}
+            //catch(PaymentNotFoundException ex)
+            //{
+            //    return NotFound(new { error = ex.Message });
+            //}
+        }
+        [HttpGet("Total Number Of Users")]
+        [ProducesResponseType(typeof(IEnumerable<Payment>), 200)]
+        public IActionResult GetTotalNoOfUsers()
+        {
+            //try
+            //{
+            var totalUserCount = service.GetTotalNoOfUsers();
+            return Ok(totalUserCount);
+            //}
+            //catch(UsersNotFoundException ex)
+            //{
+            //    return NotFound(new { error = ex.Message });
+            //}
+        }
+            //[HttpGet]
+            //[ProducesResponseType(typeof(IEnumerable<Event>), 200)]
+            //public IActionResult GetAllEvents()
+            //{
+            //    try
+            //    {
+            //        var c = service.GetAllEvents();
+            //        if(!c.Any())
+            //        {
+            //            return Ok("No Events Found");
+            //        }
+            //        return Ok(c);
+            //    }
+            //    catch (EventsNotFoundException ex)
+            //    {
+            //        return NotFound(new { error = ex.Message });
+            //    }
+            //}
+
+
+            [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Event>), 200)]
         public IActionResult GetAllEvents()
         {
             try
             {
-                var c = service.GetAllEvents();
-                return Ok(c);
+                var events = service.GetAllEvents();
+                if (!events.Any())
+                {
+                    return Ok(new { message = "No Events Found", events = new List<Event>() }); 
+                }
+                return Ok(events);
             }
             catch (EventsNotFoundException ex)
             {
                 return NotFound(new { error = ex.Message });
             }
         }
+
+
+
+
         [HttpGet("by-name")]
         public IActionResult GetEventByName([FromQuery] string? eventName)
         {
@@ -110,6 +191,7 @@ namespace Event_Management.Controllers
             try
             {
                 var ev=service.FetchEventName(eventName);
+                
                 return Ok(ev);
             }
             catch (EventsNotFoundException ex)
@@ -126,9 +208,14 @@ namespace Event_Management.Controllers
         {
             if (string.IsNullOrWhiteSpace(location))
                 return BadRequest("You didn't enter new event location. Please enter it");
-
             var ev = service.FetchEventLocation(location);
+            if (!ev.Any())
+            {
+                return Ok($"Event with Location {location} doesn't exist ");
+            }
             return Ok(ev);
+
+            
         }
 
         [HttpGet("by-date")]
@@ -138,16 +225,20 @@ namespace Event_Management.Controllers
                 return BadRequest("You didn't enter new event date. Please enter it");
 
             var ev = service.FetchEventDate(date.Value);
+            if (!ev.Any())
+            {
+                return Ok($"Event with Date {date} doesn't exist ");
+            }
             return Ok(ev);
         }
 
-        [HttpGet("tickets")]
-        [ProducesResponseType(typeof(IEnumerable<Event>), 200)]
-        public IActionResult GetAllTickets()
-        {
-            var Ticket = service.GetAllTickets();
-            return Ok(Ticket);
-        }
+        //[HttpGet("tickets")]
+        //[ProducesResponseType(typeof(IEnumerable<Event>), 200)]
+        //public IActionResult GetAllTickets()
+        //{
+        //    var Ticket = service.GetAllTickets();
+        //    return Ok(Ticket);
+        //}
 
         [HttpGet("{id}")]
         public IActionResult GetEventById(int? id)
@@ -163,6 +254,13 @@ namespace Event_Management.Controllers
             {
                 return NotFound(new { error = ex.Message });
             }
+        }
+        [HttpGet("Event Summary Report")]
+        [ProducesResponseType(typeof(IEnumerable<EventRevenueDto>), 200)]
+        public IActionResult GetEventRevenueSummary()
+        {
+            var eventSummary=service.GetEventRevenueSummary();
+            return Ok(eventSummary);
         }
 
 

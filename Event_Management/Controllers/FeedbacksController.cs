@@ -1,7 +1,9 @@
 ﻿using Event_Management.Data;
+using Event_Management.DTOs;
 using Event_Management.Models;
 using Event_Management.Services;
 using EventFeedback.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,39 +24,25 @@ namespace Event_Management.Controllers
         {
             _service = service;
         }
-        [HttpGet("View all Feedbacks")]
+        [HttpGet("ViewAllFeedbacks")]
         public IActionResult GetFeedback()
         {
             return Ok(_service.GetFeedback());
         }
 
-
-
+        [Authorize(Roles = "User")]
         [HttpPost("SubmitFeedback")]
-        public ActionResult SubmitFeedback(Feedback feedback)
+        public ActionResult SubmitFeedback([FromBody] CreateFeedbackDto feedback)
         {
             try
             {
-                return StatusCode(201, _service.SubmitFeedback(feedback)); //Place breakpoints and debug
+                return Ok(_service.SubmitFeedback(feedback));
             }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
-        }
 
-
-        [HttpPut("UpdateFeedback/{id}")]
-        public IActionResult UpdateFeedback(int id, Feedback feedback)
-        {
-            try
-            {
-                return Ok(_service.UpdateFeedback(id, feedback));
-            }
-            catch (FeedbackNotFound e)
-            {
-                return BadRequest(e.Message);
-            }
         }
 
         [HttpGet("GetFeedbackSummary/{eventId}")]
@@ -67,7 +55,7 @@ namespace Event_Management.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(500, e.Message);
+                return BadRequest(e.Message);
             }
         }
 
@@ -81,11 +69,11 @@ namespace Event_Management.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
-        [HttpGet("ReviewFeedbacks")]
+        [HttpGet("FilterFeedbacks")]
 
         public ActionResult<List<Feedback>> GetFilteredFeedbacks(
         string? eventName,
@@ -99,42 +87,31 @@ namespace Event_Management.Controllers
             try
             {
                 var result = _service.GetFilteredFeedbacks(
-                    eventName, minRating, startDate, endDate, search, sortBy.ToString(), sortOrder.ToString());
+                    eventName, minRating, startDate, endDate, search, sortBy, sortOrder);
                 return Ok(result);
-            }
-            catch (FeedbackNotFound ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
+        [Authorize(Roles = "Organiser")]
         [HttpPost("ReplyToFeedback/{feedbackId}")]
-        public IActionResult ReplyToFeedback(int feedbackId, Replies reply)
+        public IActionResult ReplyToFeedback(int feedbackId, ReplyDto reply)
         {
             try
             {
                 _service.SubmitReply(feedbackId, reply);
                 return Ok("Reply submitted successfully");
             }
-
-            catch (FeedbackNotFound ex)
-            {
-                return NotFound(ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 
+        [Authorize(Roles = "Organiser")]
         [HttpPut("ArchiveFeedback/{feedbackId}")]
         public IActionResult ArchiveFeedback(int feedbackId)
         {
@@ -143,19 +120,13 @@ namespace Event_Management.Controllers
                 _service.ArchiveFeedback(feedbackId);
                 return Ok("Feedback Archived");
             }
-            catch (FeedbackNotFound ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (FeedbackAlreadyArchivedException ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
         }
+
+        [Authorize(Roles = "Organiser")]
         [HttpPut("UnArchiveFeedback/{feedbackId}")]
         public IActionResult UnArchiveFeedback(int feedbackId)
         {
@@ -164,17 +135,9 @@ namespace Event_Management.Controllers
                 _service.UnArchiveFeedback(feedbackId);
                 return Ok("Feedback Unarchived");
             }
-            catch (FeedbackNotFound ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (FeedbackNotArchivedException ex)
-            {
-                return BadRequest(ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return BadRequest(ex.Message);
             }
         }
     }

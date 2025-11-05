@@ -6,5 +6,6 @@
             : base($"Category with name '{Id}' was not found.")
         {
         }
+        public CategoryNotFoundException() : base("Category name doesnot exists.") { }
     }
 }

@@ -12,7 +12,7 @@ namespace Event_Management.Models
         public decimal Amount { get; set; }
         public DateTime PaymentDate { get; set; }
         public string PaymentMethod { get; set; }
-        public string Status { get; set; } // e.g., Completed, Failed
+        public string Status { get; set; } 
         public virtual Booking Booking { get; set; }
         //public virtual Ticket Ticket { get; set; }
 
