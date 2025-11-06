@@ -1,4 +1,5 @@
 ﻿using Event_Management.DTOs;
+using Event_Management.ExceptionHandlers;
 using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Services;
@@ -8,7 +9,8 @@ namespace Event_Management.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EventsController : ControllerBase
+    [ExceptionHandler] // to handle exceptions globally for this controller
+    public class EventsController : ControllerBase //features required to run a dotnet application
     {
         private readonly IEventService service;
 
@@ -16,7 +18,7 @@ namespace Event_Management.Controllers
         {
             service = eventService;
         }
-        
+
         [HttpPost]
         public IActionResult CreateEvent(Event events)
         {
@@ -47,26 +49,40 @@ namespace Event_Management.Controllers
 
 
 
-    [HttpPut("update-event")]
-    public IActionResult UpdateEvent(
-    [FromQuery] int id,
-    [FromQuery] string? name,
-    [FromQuery] string? description,
-    [FromQuery] string? location,
-    [FromQuery] int TotalSeats,
-    [FromQuery] decimal PricePerTicket,
-    [FromQuery] DateOnly? date,
-    [FromQuery] TimeOnly? time,
-    
-    [FromQuery]TimeOnly? endTime
-    )
+        [HttpPut("update-event")]
+        public IActionResult UpdateEvent(
+        [FromQuery] int id,
+        [FromQuery] string? name,
+        [FromQuery] string? description,
+        [FromQuery] string? location,
+        [FromQuery] int TotalSeats,
+        [FromQuery] decimal PricePerTicket,
+        [FromQuery] DateOnly? date,
+        [FromQuery] TimeOnly? time,
+
+        [FromQuery] TimeOnly? endTime
+        )
         {
-            if (name == null && description == null && date == null && time == null && location == null)
+
+            //if (name == null && description == null && date == null && time == null && location == null)
+            //    return BadRequest("No fields provided to update.");
+
+            if (string.IsNullOrWhiteSpace(name) &&
+    string.IsNullOrWhiteSpace(description) &&
+    string.IsNullOrWhiteSpace(location) &&
+    TotalSeats <= 0 &&
+    PricePerTicket <= 0 &&
+    date == null &&
+    time == null &&
+    endTime == null)
+            {
                 return BadRequest("No fields provided to update.");
+            }
+
 
             try
             {
-                service.UpdateEvent(id, name, description, location, TotalSeats, PricePerTicket,date, time,endTime);
+                service.UpdateEvent(id, name, description, location, TotalSeats, PricePerTicket, date, time, endTime);
                 return Ok("Event updated successfully.");
             }
             catch (EventUpdateException ex)
@@ -74,7 +90,7 @@ namespace Event_Management.Controllers
                 return BadRequest(new { error = ex.Message });
 
             }
-            catch(EventsNotFoundException ex)
+            catch (EventsNotFoundException ex)
             {
                 return NotFound(new { error = ex.Message });
             }
@@ -103,29 +119,29 @@ namespace Event_Management.Controllers
         [ProducesResponseType(typeof(IEnumerable<Booking>), 200)]
         public IActionResult GetTotalBookings()
         {
-            //try
-            //{
+            try
+            {
                 var totalBookings = service.GetTotalBookings();
                 return Ok(totalBookings);
-            //}
-            //catch(BookingsNotFoundException ex)
-            //{
-            //    return NotFound(new { error = ex.Message });
-            //}
+            }
+            catch(BookingNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message});
+            }
         }
         [HttpGet("Total Revenue Generated")]
         [ProducesResponseType(typeof(IEnumerable<Payment>), 200)]
         public IActionResult GetTotalRevenue()
         {
-            //try
-            //{
-            var totalRevenue = service.GetTotalBookings();
+            try
+            {
+                var totalRevenue = service.GetTotalRevenue();
             return Ok(totalRevenue);
-            //}
-            //catch(PaymentNotFoundException ex)
-            //{
-            //    return NotFound(new { error = ex.Message });
-            //}
+            }
+            catch (BookingNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
         }
         [HttpGet("Total Number Of Users")]
         [ProducesResponseType(typeof(IEnumerable<Payment>), 200)]
@@ -141,27 +157,10 @@ namespace Event_Management.Controllers
             //    return NotFound(new { error = ex.Message });
             //}
         }
-            //[HttpGet]
-            //[ProducesResponseType(typeof(IEnumerable<Event>), 200)]
-            //public IActionResult GetAllEvents()
-            //{
-            //    try
-            //    {
-            //        var c = service.GetAllEvents();
-            //        if(!c.Any())
-            //        {
-            //            return Ok("No Events Found");
-            //        }
-            //        return Ok(c);
-            //    }
-            //    catch (EventsNotFoundException ex)
-            //    {
-            //        return NotFound(new { error = ex.Message });
-            //    }
-            //}
+        
 
 
-            [HttpGet]
+        [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Event>), 200)]
         public IActionResult GetAllEvents()
         {
@@ -170,7 +169,7 @@ namespace Event_Management.Controllers
                 var events = service.GetAllEvents();
                 if (!events.Any())
                 {
-                    return Ok(new { message = "No Events Found", events = new List<Event>() }); 
+                    return Ok(new { message = "No Events Found", events = new List<Event>() });
                 }
                 return Ok(events);
             }
@@ -190,8 +189,8 @@ namespace Event_Management.Controllers
                 return BadRequest("You didn't enter new event name. Please enter it");
             try
             {
-                var ev=service.FetchEventName(eventName);
-                
+                var ev = service.FetchEventName(eventName);
+
                 return Ok(ev);
             }
             catch (EventsNotFoundException ex)
@@ -215,7 +214,7 @@ namespace Event_Management.Controllers
             }
             return Ok(ev);
 
-            
+
         }
 
         [HttpGet("by-date")]
@@ -255,12 +254,20 @@ namespace Event_Management.Controllers
                 return NotFound(new { error = ex.Message });
             }
         }
+
         [HttpGet("Event Summary Report")]
         [ProducesResponseType(typeof(IEnumerable<EventRevenueDto>), 200)]
         public IActionResult GetEventRevenueSummary()
         {
-            var eventSummary=service.GetEventRevenueSummary();
-            return Ok(eventSummary);
+            try
+            {
+                var eventSummary = service.GetEventRevenueSummary();
+                return Ok(eventSummary);
+            }
+            catch (EventsNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
         }
 
 
@@ -270,7 +277,7 @@ namespace Event_Management.Controllers
             if (string.IsNullOrWhiteSpace(eventName))
                 return BadRequest("You didn't enter new event name. Please enter it");
 
-            
+
             try
             {
                 service.Delete(eventName);

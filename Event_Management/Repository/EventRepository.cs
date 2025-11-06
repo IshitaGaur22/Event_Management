@@ -50,8 +50,12 @@ namespace Event_Management.Repository
 
         public decimal GetTotalRevenue()
         {
-            return context.Payment.Select(p => p.Amount).Sum();
+            return context.Booking
+                .Include(b => b.Event)
+                .Where(b => b.Event != null)
+                .Sum(b => b.SelectedSeats * b.Event.PricePerTicket);
         }
+
         public int GetTotalNoOfUsers()
         {
             return context.User.Count();
@@ -130,7 +134,7 @@ namespace Event_Management.Repository
         }
 
         public Event GetEventByName(string eventName) =>
-    context.Event.Single(e =>
+    context.Event.SingleOrDefault(e =>
         e.EventName==eventName);
 
         public List<Event> GetEventById(int id) => context.Event

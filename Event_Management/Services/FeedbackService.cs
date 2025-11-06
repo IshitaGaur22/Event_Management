@@ -1,6 +1,6 @@
 ﻿using Event_Management.DTOs;
 using Event_Management.Exceptions;
-using Event_Management.Migrations;
+//using Event_Management.Migrations;
 using Event_Management.Models;
 using Event_Management.Repository;
 using EventFeedback.Exceptions;
