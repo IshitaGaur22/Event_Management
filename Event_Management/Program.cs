@@ -1,8 +1,10 @@
-﻿using Event_Management.Data;
+﻿using System.Security.Claims;
+using Event_Management.Data;
 using Event_Management.ExceptionHandlers;
 using Event_Management.Exceptions;
 using Event_Management.Repository;
 using Event_Management.Services;
+using Event_Management.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -10,35 +12,101 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
-
-var builder = WebApplication.CreateBuilder(args); 
-//Createbuilder method initializes a new instance of the WebApplicationBuilder class with preconfigured defaults.
-
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());//to convert enum values to their string representation in JSON responses
     });
-
-builder.Services.AddAuthentication(options =>//to set up authentication services
+string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:3000") 
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
+builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;//specifies the default authentication scheme to be used by the application
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    //options.InvalidModelStateResponseFactory = context =>
+    //{
+
+    //    if (!context.ModelState.IsValid &&
+    //        context.ModelState.Values.All(v => v.Errors.Count > 0))
+    //    {
+    //        return new BadRequestObjectResult(new
+    //        {
+    //            error = "Value have not been entered, please enter values."
+    //        });
+    //    }
+
+    //    return new BadRequestObjectResult(new
+    //    {
+    //        error = "Invalid model state.",
+    //        details = context.ModelState
+    //    });
+    //};
+
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        RoleClaimType = ClaimTypes.Role
+    };
+
+
+});
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-builder.Services.AddEndpointsApiExplorer();//to configure services for API endpoint exploration and documentation generation.
-builder.Services.AddSwaggerGen();//to generate Swagger/OpenAPI documentation for the API.
-
-builder.Services.AddDbContext<Event_ManagementContext>(options =>//to configure the database context for the application
+builder.Services.AddDbContext<Event_ManagementContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Event_ManagementContext")));
 
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 //to register the EventRepository class as the implementation of the IEventRepository interface in the dependency injection container.
 builder.Services.AddScoped<IEventService, EventService>();
-
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -70,6 +138,9 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 var app = builder.Build();//Builds the WebApplication instance using the configured services and middleware.
 
 if (app.Environment.IsDevelopment())//to check if the application is running in a development environment
+app.UseMiddleware<ExceptionMiddleware>();
+
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();//to enable middleware for serving the generated Swagger as a JSON endpoint.
     app.UseSwaggerUI();
@@ -83,5 +154,9 @@ app.UseAuthorization();//to enable authorization middleware, which checks if the
 app.MapControllers();//to map controller routes to the corresponding controller actions.
 
 app.UseMiddleware<ExceptionMiddleware>();//to add custom exception handling middleware to the application's request pipeline.
+
+app.UseRouting();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.Run();//to run the application and start listening for incoming HTTP requests.

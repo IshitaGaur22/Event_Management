@@ -7,7 +7,7 @@ namespace Event_Management.Services
     public interface IUserService
     {
         Task<string> RegisterAsync(RegisterDto dto);
-        Task<string> LoginAsync(LoginDto dto);
+        Task<LoginResponse> LoginAsync(LoginDto dto);
         Task<bool> ValidateLoginAsync(LoginDto dto);
         Task ResetPasswordAsync(ResetPasswordDto dto);
     }

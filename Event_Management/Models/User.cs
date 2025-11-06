@@ -1,11 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Event_Management.Aspects;
+using System.ComponentModel.DataAnnotations;
 
 namespace Event_Management.Models
 {
     public class User
     {
-        
-
         [Key]
         public int UserId { get; set; }
         [Required]
@@ -18,6 +17,7 @@ namespace Event_Management.Models
         public string Email { get; set; }
 
         [Required]
+        [Aspects.PasswordValidation]
         public string PasswordHash { get; set; }
 
         [Required]
@@ -32,5 +32,7 @@ namespace Event_Management.Models
         [Required]
         public string Location { get; set; }
 
+        [OrganisationNameReq]
+        public string? OrganisationName { get; set; }
     }
 }

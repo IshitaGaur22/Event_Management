@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+
+
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace Event_Management.Models
 {
@@ -8,11 +9,9 @@ namespace Event_Management.Models
     {
         [Key]
         public int EventID { get; set; }
-        [Required]
 
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Event name must be at least 3 characters.")]
         public string EventName { get; set; }
-        
 
         public string Description { get; set; }
 
@@ -21,9 +20,6 @@ namespace Event_Management.Models
 
         [Required(ErrorMessage = "Please Choose a category.")]
         public int CategoryID { get; set; }
-        [JsonIgnore]
-        public Category Category { get; set; }
-
 
         [Required]
         public int TotalSeats { get; set; }
@@ -42,7 +38,6 @@ namespace Event_Management.Models
         [Required(ErrorMessage = "End Time should be taken after the start time")]
         public TimeOnly EndTime { get; set; }
 
-        //custom validation for EndTime
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (EndTime <= EventTime)
@@ -50,6 +45,9 @@ namespace Event_Management.Models
                 yield return new ValidationResult("End time must be after start time.", new[] { nameof(EndTime) });
             }
         }
+
+        public string? ImagePath { get; set; } = null;
+
     }
 
     public class FutureOrTodayDateAttribute : ValidationAttribute
@@ -75,15 +73,16 @@ namespace Event_Management.Models
 
             var instance = validationContext.ObjectInstance;
             var type = validationContext.ObjectType;
-            var dateProperty = type.GetProperty("EventDate");
+            var dateProp = type.GetProperty("EventDate");
 
-            if (dateProperty == null || dateProperty.GetValue(instance) is not DateOnly eventDate)
+            if (dateProp == null || dateProp.GetValue(instance) is not DateOnly eventDate)
                 return ValidationResult.Success;
 
             var today = DateOnly.FromDateTime(DateTime.Today);
             var now = TimeOnly.FromDateTime(DateTime.Now);
             var nextHour = now.AddHours(1);
 
+            // If the event is today, time must be at least one hour ahead
             if (eventDate == today && time < nextHour)
             {
                 return new ValidationResult("Start time must be at least one hour from now.");

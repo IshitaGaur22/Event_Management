@@ -15,8 +15,8 @@ namespace Event_Management.Services
                     DateTime? startDate,
                     DateTime? endDate,
                     string? search,
-                    string sortBy,
-                    string sortOrder);
+                    SortByOptions sortBy,
+                    SortOrderOptions sortOrder);
         public int SubmitReply(int feedbackId, ReplyDto reply);
         public int ArchiveFeedback(int feedbackId);
         public int UnArchiveFeedback(int feedbackId);
