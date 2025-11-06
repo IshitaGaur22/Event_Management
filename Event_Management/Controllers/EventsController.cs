@@ -1,4 +1,5 @@
 ﻿using Event_Management.DTOs;
+using Event_Management.ExceptionHandlers;
 using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Services;
@@ -8,7 +9,8 @@ namespace Event_Management.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EventsController : ControllerBase
+    [ExceptionHandler] // to handle exceptions globally for this controller
+    public class EventsController : ControllerBase //features required to run a dotnet application
     {
         private readonly IEventService service;
 

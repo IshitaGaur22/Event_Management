@@ -1,5 +1,4 @@
 ﻿using Event_Management.Data;
-using Event_Management.Data;
 using Event_Management.ExceptionHandlers;
 using Event_Management.Exceptions;
 using Event_Management.Repository;
@@ -7,82 +6,37 @@ using Event_Management.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
-using Event_Management.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args); 
+//Createbuilder method initializes a new instance of the WebApplicationBuilder class with preconfigured defaults.
 
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());//to convert enum values to their string representation in JSON responses
     });
 
-builder.Services.AddAuthentication(options =>
+builder.Services.AddAuthentication(options =>//to set up authentication services
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;//specifies the default authentication scheme to be used by the application
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    //options.InvalidModelStateResponseFactory = context =>
-    //{
-
-    //    if (!context.ModelState.IsValid &&
-    //        context.ModelState.Values.All(v => v.Errors.Count > 0))
-    //    {
-    //        return new BadRequestObjectResult(new
-    //        {
-    //            error = "Value have not been entered, please enter values."
-    //        });
-    //    }
-
-    //    return new BadRequestObjectResult(new
-    //    {
-    //        error = "Invalid model state.",
-    //        details = context.ModelState
-    //    });
-    //};
-
-
-
 });
 
 
-//builder.Services.Configure<ApiBehaviorOptions>(options =>
-//{
-//    options.InvalidModelStateResponseFactory = context =>
-//    {
+builder.Services.AddEndpointsApiExplorer();//to configure services for API endpoint exploration and documentation generation.
+builder.Services.AddSwaggerGen();//to generate Swagger/OpenAPI documentation for the API.
 
-//        if (!context.ModelState.IsValid &&
-//            context.ModelState.Values.All(v => v.Errors.Count > 0))
-//        {
-//            return new BadRequestObjectResult(new
-//            {
-//                error = "Value has not been entered, please enter values."
-//            });
-//        }
-
-//        return new BadRequestObjectResult(new
-//        {
-//            error = "Invalid model state.",
-//            details = context.ModelState
-//        });
-//    };
-//});
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<Event_ManagementContext>(options =>
+builder.Services.AddDbContext<Event_ManagementContext>(options =>//to configure the database context for the application
     options.UseSqlServer(builder.Configuration.GetConnectionString("Event_ManagementContext")));
 
 builder.Services.AddScoped<IEventRepository, EventRepository>();
+//to register the EventRepository class as the implementation of the IEventRepository interface in the dependency injection container.
 builder.Services.AddScoped<IEventService, EventService>();
 
 
@@ -104,26 +58,30 @@ builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 
 builder.Services.AddScoped<IBookingHistoryRepository, BookingHistoryRepository>();
 builder.Services.AddScoped<IBookingHistoryService, BookingHistoryService>();
+
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
 builder.Services.AddScoped<IEmailService, EmailService>();
+//why not add transient?
+//because we want to maintain a single instance of the email service throughout the request lifecycle.
 
 
-var app = builder.Build();
+var app = builder.Build();//Builds the WebApplication instance using the configured services and middleware.
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())//to check if the application is running in a development environment
 {
-    app.UseSwagger();
+    app.UseSwagger();//to enable middleware for serving the generated Swagger as a JSON endpoint.
     app.UseSwaggerUI();
+//to enable middleware for serving the Swagger UI, which provides a web-based interface for exploring and testing the API endpoints.
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection();//to redirect HTTP requests to HTTPS.
 
-app.UseAuthorization();
+app.UseAuthorization();//to enable authorization middleware, which checks if the user is authorized to access certain resources.
 
-app.MapControllers();
+app.MapControllers();//to map controller routes to the corresponding controller actions.
 
-app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();//to add custom exception handling middleware to the application's request pipeline.
 
-
-app.Run();
+app.Run();//to run the application and start listening for incoming HTTP requests.
