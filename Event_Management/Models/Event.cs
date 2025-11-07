@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace Event_Management.Models
 {
 
-    public class Event:IValidateObject
+    public class Event
     {
         [Key]
         public int EventID { get; set; }

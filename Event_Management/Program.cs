@@ -37,26 +37,10 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    //options.InvalidModelStateResponseFactory = context =>
-    //{
-
-    //    if (!context.ModelState.IsValid &&
-    //        context.ModelState.Values.All(v => v.Errors.Count > 0))
-    //    {
-    //        return new BadRequestObjectResult(new
-    //        {
-    //            error = "Value have not been entered, please enter values."
-    //        });
-    //    }
-
-    //    return new BadRequestObjectResult(new
-    //    {
-    //        error = "Invalid model state.",
-    //        details = context.ModelState
-    //    });
-    //};
-
-    options.InvalidModelStateResponseFactory = context =>
+    // --- THIS IS THE CRITICAL FIX ---
+    // You were missing this entire section.
+    // This tells the API how to validate the token.
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -66,11 +50,11 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-        RoleClaimType = ClaimTypes.Role
+        RoleClaimType = ClaimTypes.Role // This tells .NET to read the "role" claim
     };
-
-
+    // ----------------------------------
 });
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
