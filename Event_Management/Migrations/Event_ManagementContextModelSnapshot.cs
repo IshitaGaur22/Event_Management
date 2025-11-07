@@ -123,8 +123,7 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<TimeOnly?>("EndTime")
-                        .IsRequired()
+                    b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
 
                     b.Property<DateOnly>("EventDate")
@@ -137,6 +136,9 @@ namespace Event_Management.Migrations
 
                     b.Property<TimeOnly>("EventTime")
                         .HasColumnType("time");
+
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -360,13 +362,11 @@ namespace Event_Management.Migrations
 
             modelBuilder.Entity("Event_Management.Models.Event", b =>
                 {
-                    b.HasOne("Event_Management.Models.Category", "Category")
-                        .WithMany()
+                    b.HasOne("Event_Management.Models.Category", null)
+                        .WithMany("Events")
                         .HasForeignKey("CategoryID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Event_Management.Models.Feedback", b =>

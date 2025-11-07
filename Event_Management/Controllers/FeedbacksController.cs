@@ -30,7 +30,7 @@ namespace Event_Management.Controllers
             return Ok(_service.GetFeedback());
         }
 
-        [Authorize(Roles = "User")]
+        
         [HttpPost("SubmitFeedback")]
         public ActionResult SubmitFeedback([FromBody] CreateFeedbackDto feedback)
         {
@@ -43,6 +43,23 @@ namespace Event_Management.Controllers
                 return BadRequest(e.Message);
             }
 
+        }
+
+        [HttpGet("GetBookedEventsByUserId/{userId}")]
+        public ActionResult<object> GetBookedEventsByUserId(int userId)
+        {
+            try
+            {
+                var events = _service.GetBookedEventsForUser(userId);
+
+                if (events == null || !events.Any())
+                    return NotFound("No booked events found for this user.");
+                return Ok(events);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpGet("GetFeedbackSummary/{eventId}")]
@@ -96,7 +113,7 @@ namespace Event_Management.Controllers
             }
         }
 
-        [Authorize(Roles = "Organiser")]
+        
         [HttpPost("ReplyToFeedback/{feedbackId}")]
         public IActionResult ReplyToFeedback(int feedbackId, ReplyDto reply)
         {
@@ -111,7 +128,7 @@ namespace Event_Management.Controllers
             }
         }
 
-        [Authorize(Roles = "Organiser")]
+        
         [HttpPut("ArchiveFeedback/{feedbackId}")]
         public IActionResult ArchiveFeedback(int feedbackId)
         {
@@ -126,7 +143,7 @@ namespace Event_Management.Controllers
             }
         }
 
-        [Authorize(Roles = "Organiser")]
+        
         [HttpPut("UnArchiveFeedback/{feedbackId}")]
         public IActionResult UnArchiveFeedback(int feedbackId)
         {
