@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Event_Management.Models
 {
@@ -11,7 +12,9 @@ namespace Event_Management.Models
         [Required(ErrorMessage = "Category name is required.")]
         public string CategoryName { get; set; }
 
-       // public ICollection<Event> Events { get; set; }
+        [JsonIgnore]
+
+        public ICollection<Event> Events { get; set; }
 
     }
 }

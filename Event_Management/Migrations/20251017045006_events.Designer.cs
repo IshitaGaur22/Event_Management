@@ -4,6 +4,7 @@ using Event_Management.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Event_Management.Migrations
 {
     [DbContext(typeof(Event_ManagementContext))]
-    partial class Event_ManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20251017045006_events")]
+    partial class events
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,42 +24,6 @@ namespace Event_Management.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Event_Management.DTOs.EventRevenueDto", b =>
-                {
-                    b.Property<int>("EventID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventID"));
-
-                    b.Property<decimal>("ActualRevenue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("EstimatedRevenue")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateOnly>("EventDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("EventName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("PricePerTicket")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("TotalSeats")
-                        .HasColumnType("int");
-
-                    b.HasKey("EventID");
-
-                    b.ToTable("EventRevenueDto");
-                });
 
             modelBuilder.Entity("Event_Management.Models.Booking", b =>
                 {
@@ -123,10 +90,6 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<TimeOnly?>("EndTime")
-                        .IsRequired()
-                        .HasColumnType("time");
-
                     b.Property<DateOnly>("EventDate")
                         .HasColumnType("date");
 
@@ -165,8 +128,7 @@ namespace Event_Management.Migrations
 
                     b.Property<string>("Comments")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ContentQuality")
                         .HasColumnType("int");
@@ -212,29 +174,29 @@ namespace Event_Management.Migrations
 
             modelBuilder.Entity("Event_Management.Models.Notification", b =>
                 {
-                    b.Property<int>("NotificationId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Type")
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("NotificationId");
-
-                    b.HasIndex("UserId");
+                    b.HasKey("Id");
 
                     b.ToTable("Notification");
                 });
@@ -315,9 +277,6 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OrganisationName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -361,7 +320,7 @@ namespace Event_Management.Migrations
             modelBuilder.Entity("Event_Management.Models.Event", b =>
                 {
                     b.HasOne("Event_Management.Models.Category", "Category")
-                        .WithMany()
+                        .WithMany("Events")
                         .HasForeignKey("CategoryID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -384,17 +343,6 @@ namespace Event_Management.Migrations
                         .IsRequired();
 
                     b.Navigation("Event");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Notification", b =>
-                {
-                    b.HasOne("Event_Management.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("User");
                 });

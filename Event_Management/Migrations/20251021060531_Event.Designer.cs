@@ -4,6 +4,7 @@ using Event_Management.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Event_Management.Migrations
 {
     [DbContext(typeof(Event_ManagementContext))]
-    partial class Event_ManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20251021060531_Event")]
+    partial class Event
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,8 +126,7 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<TimeOnly?>("EndTime")
-                        .IsRequired()
+                    b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
 
                     b.Property<DateOnly>("EventDate")
@@ -165,8 +167,7 @@ namespace Event_Management.Migrations
 
                     b.Property<string>("Comments")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ContentQuality")
                         .HasColumnType("int");
@@ -315,9 +316,6 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OrganisationName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -361,7 +359,7 @@ namespace Event_Management.Migrations
             modelBuilder.Entity("Event_Management.Models.Event", b =>
                 {
                     b.HasOne("Event_Management.Models.Category", "Category")
-                        .WithMany()
+                        .WithMany("Events")
                         .HasForeignKey("CategoryID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
