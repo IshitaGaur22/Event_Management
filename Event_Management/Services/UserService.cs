@@ -55,7 +55,8 @@ namespace Event_Management.Services
             return new LoginResponse
             {
                 Token = token,
-                Role = user.Role
+                Role = user.Role,
+                UserId = user.UserId
             };
         }
 
