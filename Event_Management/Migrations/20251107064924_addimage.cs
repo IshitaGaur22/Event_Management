@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Event_Management.Migrations
 {
     /// <inheritdoc />
-    public partial class Event : Migration
+    public partial class addimage : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -54,7 +54,8 @@ namespace Event_Management.Migrations
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<long>(type: "bigint", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OrganisationName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -75,7 +76,8 @@ namespace Event_Management.Migrations
                     PricePerTicket = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     EventDate = table.Column<DateOnly>(type: "date", nullable: false),
                     EventTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "time", nullable: false)
+                    EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
+                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -152,7 +154,7 @@ namespace Event_Management.Migrations
                     VenueFacilities = table.Column<int>(type: "int", nullable: false),
                     EventOrganization = table.Column<int>(type: "int", nullable: false),
                     ValueForMoney = table.Column<int>(type: "int", nullable: false),
-                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Comments = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Reply = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ReplyTime = table.Column<DateTime>(type: "datetime2", nullable: true),

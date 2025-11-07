@@ -32,7 +32,7 @@ namespace Event_Management.Repository
         public bool HasUserAttendedEvent(int userId, int eventId)
         {
             return _context.Booking
-                .Any(b => b.UserId == userId && b.EventId == eventId && b.Status=="Attended");
+                .Any(b => b.UserId == userId && b.EventId == eventId );
         }
         public bool HasUserAlreadySubmittedFeedback(int userId, int eventId)
         {
@@ -207,6 +207,23 @@ namespace Event_Management.Repository
             feed.IsArchived = false;
             return _context.SaveChanges();
         }
+        // This method should be in your BookingService or BookingRepository
+        // It assumes you have a DbSet for Events called _context.Events
+        // and that your Booking model has a 'UserId' and 'EventId' property.
 
+        public IEnumerable<Event> GetBookedEventsForUser(int userId)
+        {
+            var bookedEventIds = _context.Booking
+                                         .Where(b => b.UserId == userId)
+                                         .Select(b => b.EventId) 
+                                         .ToList();
+            if (!bookedEventIds.Any())
+            {
+                return new List<Event>(); 
+            }
+            return _context.Event
+                           .Where(e => bookedEventIds.Contains(e.EventID)) 
+                           .ToList();
+        }
     }
 }
