@@ -32,7 +32,5 @@ namespace Event_Management.Models
         [Required]
         public string Location { get; set; }
 
-        [OrganisationNameReq]
-        public string? OrganisationName { get; set; }
     }
 }
