@@ -5,6 +5,7 @@ using Event_Management.Models;
 using Event_Management.Repository;
 using Microsoft.AspNetCore.Identity.Data;
 using Org.BouncyCastle.Crypto.Generators;
+using BCrypt;
 using System.Security.Authentication;
 
 namespace Event_Management.Services
@@ -38,8 +39,6 @@ namespace Event_Management.Services
             await _usersRepository.AddUserAsync(user);
             return "User registered successfully";
         }
-
-       
 
         public async Task<LoginResponse> LoginAsync(LoginDto dto)
         {
@@ -77,7 +76,7 @@ namespace Event_Management.Services
             await _usersRepository.UpdateUserAsync(user);
         }
 
-        
+
 
         public Task<string> RegisterAsync(User user)
         {

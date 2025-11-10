@@ -21,15 +21,11 @@ namespace Event_Management.Repository
         public int AddEvent(Event ev)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventName == ev.EventName);
-
-            
             var categoryExists = context.Category.Any(c => c.CategoryID == ev.CategoryID);
             if (!categoryExists)
             {
                 throw new CategoryNotFoundException();
             }
-
-            
             if (evt != null)
             {
                 return 0;
@@ -48,6 +44,11 @@ namespace Event_Management.Repository
             return context.Booking.Count();
         }
 
+        public int GetTotalNoOfUsers()
+        {
+            return context.User.Count();
+        }
+
         public decimal GetTotalRevenue()
         {
             return context.Booking
@@ -56,16 +57,11 @@ namespace Event_Management.Repository
                 .Sum(b => b.SelectedSeats * b.Event.PricePerTicket);
         }
 
-        public int GetTotalNoOfUsers()
+        public Event GetEventbyId(int eventId)
         {
-            return context.User.Count();
-        }
-
-        public Event GetEventbyId(int ticketId)
-        {
-            var evt = context.Event.FirstOrDefault(t => t.EventID == ticketId);
+            var evt = context.Event.FirstOrDefault(t => t.EventID == eventId);
             if (evt == null)
-                throw new TicketNotFoundException(ticketId);
+                throw new TicketNotFoundException(eventId);
             return evt;
         }
 
@@ -92,14 +88,14 @@ namespace Event_Management.Repository
         {
             var evt = context.Event.FirstOrDefault(e => e.EventName == eventName);
             if (evt == null)
-                throw new EventsNotFoundException(eventName); 
+                throw new EventsNotFoundException(eventName);
 
             context.Event.Remove(evt);
             context.SaveChanges();
         }
 
 
-        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime)
+        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime, string ImagePath)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventID == id);
             if (evt == null)
@@ -123,19 +119,19 @@ namespace Event_Management.Repository
             if (endTime.HasValue)
                 evt.EndTime = endTime.Value;
 
-            if (TotalSeats>0)
+            if (TotalSeats > 0)
                 evt.TotalSeats = TotalSeats;
-            if (PricePerTicket>0)
+            if (PricePerTicket > 0)
                 evt.PricePerTicket = PricePerTicket;
 
-          
+
             context.Event.Update(evt);
             return context.SaveChanges();
         }
 
         public Event GetEventByName(string eventName) =>
     context.Event.SingleOrDefault(e =>
-        e.EventName==eventName);
+        e.EventName == eventName);
 
         public List<Event> GetEventById(int id) => context.Event
             .Where(e => e.EventID == id)

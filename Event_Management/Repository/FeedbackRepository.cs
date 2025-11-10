@@ -3,6 +3,7 @@ using Event_Management.DTOs;
 //using Event_Management.Migrations;
 using Event_Management.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Event_Management.Repository
 {
@@ -16,7 +17,7 @@ namespace Event_Management.Repository
         
         public List<Feedback> GetAllFeedbacks()
         {
-               return _context.Feedback.Where(f=>f.IsArchived==false).ToList();
+               return _context.Feedback.Include(f=>f.Event).Include(f=>f.User).Where(f=>f.IsArchived==false).ToList();
         }
 
         public Feedback GetFeedbackById(int id)
@@ -31,7 +32,7 @@ namespace Event_Management.Repository
         public bool HasUserAttendedEvent(int userId, int eventId)
         {
             return _context.Booking
-                .Any(b => b.UserId == userId && b.EventId == eventId && b.Status=="Attended");
+                .Any(b => b.UserId == userId && b.EventId == eventId && b.Status=="Completed");
         }
         public bool HasUserAlreadySubmittedFeedback(int userId, int eventId)
         {
@@ -55,7 +56,6 @@ namespace Event_Management.Repository
 
             _context.Feedback.Add(feedback);
             return _context.SaveChanges();
-            Console.WriteLine("Your feedback has been submitted successfully.");
 
         }
 
@@ -66,6 +66,7 @@ namespace Event_Management.Repository
                 .Where(f => !f.IsArchived)
                 .GroupBy(f => new { f.EventId, f.Event.EventName })
                 .Where(g => g.Count() >= 2)
+                .Where(g=>g.Average(f=>f.Rating)>3)
                 .OrderByDescending(g => g.Average(f => f.Rating))
                 .Select(g => new
                 {
@@ -87,19 +88,47 @@ namespace Event_Management.Repository
                     AverageRating = g.Average(f => f.Rating)
                 })
                 .FirstOrDefault();
-            return summary ?? new { TotalFeedback = 0, AverageRating = 0.0 };
+
+            var ratingDistribution = _context.Feedback
+                .Where(f => f.EventId == eventId && !f.IsArchived)
+                .GroupBy(f => f.Rating) 
+                .Select(g => new
+                {
+                    Rating = g.Key, // The rating
+                    Count = g.Count() // How many people gave this rating
+                })
+                .ToList();
+            
+                if (summary == null)
+                {
+                    return new
+                    {
+                        TotalFeedback = 0,
+                        AverageRating = 0.0,
+                        RatingDistribution = new List<object>() 
+                    };
+                }
+
+                return new
+                {
+                    summary.TotalFeedback,
+                    summary.AverageRating,
+                    RatingDistribution = ratingDistribution 
+                };
         }
         public IEnumerable<object> GetFilteredFeedbacks(
                     string? eventName,
                     int? minRating,
                     DateTime? startDate,
                     DateTime? endDate,
-                    string? search)
+                    string? search,
+                    SortByOptions sortBy,  
+                    SortOrderOptions sortOrder)
         {
             var query = _context.Feedback.Include(f => f.Event).Include(u=>u.User).AsQueryable();
-
+            query = query.Where(f => f.IsArchived == false);
             if (!string.IsNullOrWhiteSpace(eventName))
-                query = query.Where(f => f.Event != null && f.Event.EventName.Contains(eventName));
+                query = query.Where(f =>f.Event.EventName.Contains(eventName));
 
             if (minRating.HasValue)
                 query = query.Where(f => f.Rating >= minRating.Value);
@@ -113,9 +142,25 @@ namespace Event_Management.Repository
             if (!string.IsNullOrWhiteSpace(search))
                 query = query.Where(f => f.Comments.Contains(search));
 
+            bool isDescending = sortOrder == SortOrderOptions.descending;
+
+            switch (sortBy)
+            {
+                case SortByOptions.Rating:
+                    query = isDescending ? query.OrderByDescending(f => f.Rating) : query.OrderBy(f => f.Rating);
+                    break;
+                case SortByOptions.SubmittedAt:
+                    query = isDescending ? query.OrderByDescending(f => f.SubmittedAt) : query.OrderBy(f => f.SubmittedAt);
+                    break;
+                case SortByOptions.FeedbackId: 
+                default:
+                    query = isDescending ? query.OrderByDescending(f => f.FeedbackId) : query.OrderBy(f => f.FeedbackId);
+                    break;
+            }
             var result = query.Select(f => new
             {
                 FeedbackId = f.FeedbackId,
+                EventId=f.EventId,
                 EventName = f.Event.EventName,
                 UserName = f.User.UserName,
                 Rating = f.Rating,
@@ -126,7 +171,8 @@ namespace Event_Management.Repository
                 Comments = f.Comments,
                 SubmittedAt = f.SubmittedAt,
                 Reply = f.Reply,
-                ReplyTime = f.ReplyTime
+                ReplyTime = f.ReplyTime,
+                IsArchived = f.IsArchived
             });
             return result;
         }
@@ -162,6 +208,23 @@ namespace Event_Management.Repository
             feed.IsArchived = false;
             return _context.SaveChanges();
         }
+        // This method should be in your BookingService or BookingRepository
+        // It assumes you have a DbSet for Events called _context.Events
+        // and that your Booking model has a 'UserId' and 'EventId' property.
 
+        public IEnumerable<Event> GetBookedEventsForUser(int userId)
+        {
+            var bookedEventIds = _context.Booking
+                                         .Where(b => b.UserId == userId)
+                                         .Select(b => b.EventId) 
+                                         .ToList();
+            if (!bookedEventIds.Any())
+            {
+                return new List<Event>(); 
+            }
+            return _context.Event
+                           .Where(e => bookedEventIds.Contains(e.EventID)) 
+                           .ToList();
+        }
     }
 }

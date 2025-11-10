@@ -1,6 +1,7 @@
 ﻿using Event_Management.DTOs;
 using Event_Management.Models;
 using Event_Management.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Authentication;
@@ -31,7 +32,6 @@ namespace Event_Management.Controllers
 
             return Ok(new { message = result });
         }
-
 
 
         [HttpPost("login")]
@@ -69,5 +69,3 @@ namespace Event_Management.Controllers
         }
     }
 }
-
-

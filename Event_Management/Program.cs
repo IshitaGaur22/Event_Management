@@ -1,4 +1,5 @@
-﻿using Event_Management.Data;
+﻿using System.Security.Claims;
+using Event_Management.Data;
 using Event_Management.ExceptionHandlers;
 using Event_Management.Exceptions;
 using Event_Management.Hubs;
@@ -22,12 +23,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());//to convert enum values to their string representation in JSON responses
     });
+
+builder.Services.AddCors(options=>
+{
+    options.AddPolicy("MyCorsPolicy", builder =>
+    {
+        builder.WithOrigins("http://localhost:3000").AllowAnyMethod()
+        .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;//specifies the default authentication scheme to be used by the application
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
@@ -75,6 +85,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddScoped<IEventRepository, EventRepository>();
+//to register the EventRepository class as the implementation of the IEventRepository interface in the dependency injection container.
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -89,17 +100,22 @@ builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IBookingHistoryRepository, BookingHistoryRepository>();
 builder.Services.AddScoped<IBookingHistoryService, BookingHistoryService>();
+
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddHostedService<EventReminderService>();
+var app = builder.Build();//Builds the WebApplication instance using the configured services and middleware.
 
-var app = builder.Build();
+if (app.Environment.IsDevelopment())//to check if the application is running in a development environment
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger();//to enable middleware for serving the generated Swagger as a JSON endpoint.
     app.UseSwaggerUI();
+//to enable middleware for serving the Swagger UI, which provides a web-based interface for exploring and testing the API endpoints.
 }
 
 // Routing -> CORS -> Auth -> Endpoints

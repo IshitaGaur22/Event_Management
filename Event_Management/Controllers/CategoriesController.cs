@@ -1,6 +1,7 @@
 ﻿using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -8,6 +9,7 @@ namespace Event_Management.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[EnableCors("MyCorsPolicy")]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _service;

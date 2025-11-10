@@ -1,11 +1,10 @@
-﻿
-
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Event_Management.Models
 {
-    public class Event : IValidatableObject
+    public class Event 
     {
         [Key]
         public int EventID { get; set; }
@@ -21,6 +20,7 @@ namespace Event_Management.Models
         [Required(ErrorMessage = "Please Choose a category.")]
         public int CategoryID { get; set; }
 
+
         [Required]
         public int TotalSeats { get; set; }
 
@@ -28,23 +28,27 @@ namespace Event_Management.Models
         public decimal PricePerTicket { get; set; }
 
         [Required(ErrorMessage = "Please enter a valid date.")]
-        [FutureOrTodayDate]
+        [FutureOrTodayDate] // <-- Server-side Date Validation
         public DateOnly EventDate { get; set; }
 
         [Required(ErrorMessage = "Please enter a valid time.")]
-        [FutureTime]
+        [FutureTime] // <-- Server-side Time Validation
         public TimeOnly EventTime { get; set; }
 
         [Required(ErrorMessage = "End Time should be taken after the start time")]
         public TimeOnly EndTime { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (EndTime <= EventTime)
-            {
-                yield return new ValidationResult("End time must be after start time.", new[] { nameof(EndTime) });
-            }
-        }
+        //// <-- Server-side EndTime > StartTime Validation
+        //public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        //{
+        //    if (EndTime <= EventTime)
+        //    {
+        //        yield return new ValidationResult("End time must be after start time.", new[] { nameof(EndTime) });
+        //    }
+        //}
+
+        public string? ImagePath { get; set; } = null;
+
     }
 
     public class FutureOrTodayDateAttribute : ValidationAttribute
@@ -86,6 +90,10 @@ namespace Event_Management.Models
             }
 
             return ValidationResult.Success;
+
+
+
+
         }
     }
 }
