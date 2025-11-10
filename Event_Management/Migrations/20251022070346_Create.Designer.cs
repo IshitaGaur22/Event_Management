@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Event_Management.Migrations
 {
     [DbContext(typeof(Event_ManagementContext))]
-    [Migration("20251021060531_Event")]
-    partial class Event
+    [Migration("20251022070346_Create")]
+    partial class Create
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -151,8 +151,6 @@ namespace Event_Management.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("EventID");
-
-                    b.HasIndex("CategoryID");
 
                     b.ToTable("Event");
                 });
@@ -356,17 +354,6 @@ namespace Event_Management.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Event_Management.Models.Event", b =>
-                {
-                    b.HasOne("Event_Management.Models.Category", "Category")
-                        .WithMany("Events")
-                        .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-                });
-
             modelBuilder.Entity("Event_Management.Models.Feedback", b =>
                 {
                     b.HasOne("Event_Management.Models.Event", "Event")
@@ -417,11 +404,6 @@ namespace Event_Management.Migrations
                         .IsRequired();
 
                     b.Navigation("Feedback");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Category", b =>
-                {
-                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }

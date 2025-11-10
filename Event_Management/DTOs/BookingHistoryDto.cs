@@ -1,4 +1,6 @@
-﻿namespace Event_Management.DTOs
+﻿using Event_Management.Models;
+
+namespace Event_Management.DTOs
 {
     public class BookingHistoryDTO
     {
@@ -9,5 +11,9 @@
         public TimeOnly EventTime { get; set; }
         public int SelectedSeats { get; set; }
         public string Status { get; set; }
+
+        public DateTime CreatedAt { get; set; } 
+
+        
     }
 }

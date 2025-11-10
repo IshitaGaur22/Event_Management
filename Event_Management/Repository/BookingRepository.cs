@@ -124,5 +124,25 @@ namespace Event_Management.Repository
             _context.Booking.Remove(booking);
             return _context.SaveChanges();
         }
+
+        public IEnumerable<Event> GetEventsStartingSoon(int minutes)
+        {
+            var now = DateTime.Now;
+            var threshold = now.AddMinutes(minutes);
+
+            return _context.Event
+                .Where(e => e.EventDate == DateOnly.FromDateTime(now) &&
+                            e.EventTime >= TimeOnly.FromDateTime(now) &&
+                            e.EventTime <= TimeOnly.FromDateTime(threshold))
+                .ToList();
+        }
+
+        public IEnumerable<User> GetUsersForEvent(int eventId)
+        {
+            return _context.Booking
+                .Where(b => b.EventId == eventId && b.Status == "Confirmed")
+                .Select(b => b.User)
+                .ToList();
+        }
     }
 }

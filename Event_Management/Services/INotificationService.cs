@@ -8,5 +8,6 @@ namespace Event_Management.Services
         Task SendBookingConfirmationEmail(User user, Event evnt, Booking booking);
         Task SendCancellationEmail(User user, Event evnt, Booking booking);
 
+        Task SendEventReminder(User Event, Event evnt);
     }
 }

@@ -3,6 +3,7 @@ using Event_Management.Models;
 using Event_Management.Services;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Authentication;
 
 namespace Event_Management.Controllers
 {
@@ -38,14 +39,17 @@ namespace Event_Management.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            var result = await _userService.LoginAsync(dto);
-
-            if (result == "Invalid email" || result == "Invalid password" || result == "Invalid role")
-                return Unauthorized(result);
-
-            return Ok(new { token = result });
+            try
+            {
+                var result = await _userService.LoginAsync(dto);
+                return Ok(result);
+            }
+            catch (InvalidCredentialException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
         }
+        
 
         [HttpPut("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)

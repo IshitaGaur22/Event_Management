@@ -36,6 +36,7 @@ namespace Event_Management.Repository
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
             return await _context.Booking
+
                 .Include(b => b.Event)
                 .Where(b => b.UserId == userId && b.Event.EventDate < today)
                 .Select(b => new BookingHistoryDTO
@@ -81,6 +82,7 @@ namespace Event_Management.Repository
                     EventTime = b.Event.EventTime,
                     SelectedSeats = b.SelectedSeats,
                     Status = b.Status
+
                 }).ToListAsync();
         }
 
@@ -88,7 +90,7 @@ namespace Event_Management.Repository
         {
             return await _context.Booking
                 .Include(b => b.Event)
-                .Include(b => b.User) // ✅ Add this line
+                .Include(b => b.User) 
                 .FirstOrDefaultAsync(b => b.BookingId == bookingId);
         }
 

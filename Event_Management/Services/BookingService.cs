@@ -1,7 +1,9 @@
-﻿using Event_Management.DTOs;
+﻿using Event_Management.Data;
+using Event_Management.DTOs;
 using Event_Management.Models;
 using Event_Management.Repository;
-using Event_Management.Data;
+using Microsoft.AspNetCore.SignalR;
+using Event_Management.Hubs;
 
 namespace Event_Management.Services
 {
@@ -10,18 +12,22 @@ namespace Event_Management.Services
         private readonly IBookingRepository _bookingRepository;
         private readonly IPaymentRepository _paymentRepository;
         private readonly IEmailService _emailService;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IHubContext<NotificationHub> _hubContext; // ✅ Added for SignalR
 
-        public BookingService(IBookingRepository repo, IPaymentRepository paymentRepository, IEmailService emailService)
+        public BookingService(IBookingRepository repo, IPaymentRepository paymentRepository, IEmailService emailService, INotificationRepository notificationRepository, IHubContext<NotificationHub> hubContext)
         {
             _bookingRepository = repo;
             _paymentRepository = paymentRepository;
             _emailService = emailService;
+            _notificationRepository = notificationRepository;
+            _hubContext = hubContext;
         }
-       
 
-       
 
-        
+
+
+
         //Post
         public BookingSummary AddBooking(int selectedSeats, string userName, int eventId)
         {
@@ -60,10 +66,30 @@ namespace Event_Management.Services
 
             _paymentRepository.AddPayment(payment);
 
-            // ✅ Send Confirmation Email
+            //  Send Confirmation Email
             var subject = "Booking Confirmation";
-            var body = $"Hi {user.UserName},\n\nYour booking for '{ev.EventName}' on {ev.EventDate} at {ev.EventTime} is confirmed.\n\nThank you!";
+            var body = $"Hi {user.UserName}, \n\nBooking ID: {booking.BookingId}\n\nYour booking for '{ev.EventName}' on {ev.EventDate} at {ev.EventTime} is confirmed.\n\nThank you!";
             _emailService.SendEmailAsync(user.Email, subject, body);
+
+            var notification = new Notification
+            {
+                UserId = user.UserId,
+                Message = subject + "\n" + body, 
+                Type = "BookingConfirmation",    
+                CreatedAt = DateTime.Now
+            };
+
+            _notificationRepository.AddNotification(notification);
+            _notificationRepository.SaveChangesAsync();
+
+
+             _hubContext.Clients.User(booking.User.UserId.ToString())
+             .SendAsync("ReceiveNotification", new
+             {
+                 message = notification.Message,
+                 createdAt = notification.CreatedAt
+             });
+
 
             return new BookingSummary
             {
