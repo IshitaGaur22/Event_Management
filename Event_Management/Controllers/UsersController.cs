@@ -49,6 +49,7 @@ namespace Event_Management.Controllers
                 return Unauthorized(ex.Message);
             }
         }
+        
 
         [HttpPut("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)

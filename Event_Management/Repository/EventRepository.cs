@@ -21,15 +21,11 @@ namespace Event_Management.Repository
         public int AddEvent(Event ev)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventName == ev.EventName);
-
-
             var categoryExists = context.Category.Any(c => c.CategoryID == ev.CategoryID);
             if (!categoryExists)
             {
                 throw new CategoryNotFoundException();
             }
-
-
             if (evt != null)
             {
                 return 0;
@@ -48,14 +44,6 @@ namespace Event_Management.Repository
             return context.Booking.Count();
         }
 
-        public decimal GetTotalRevenue()
-        {
-            return context.Booking
-                .Include(b => b.Event)
-                .Where(b => b.Event != null)
-                .Sum(b => b.SelectedSeats * b.Event.PricePerTicket);
-        }
-
         public int GetTotalNoOfUsers()
         {
             return context.User.Count();
@@ -67,11 +55,6 @@ namespace Event_Management.Repository
                 .Include(b => b.Event)
                 .Where(b => b.Event != null)
                 .Sum(b => b.SelectedSeats * b.Event.PricePerTicket);
-        }
-
-        public int GetTotalNoOfUsers()
-        {
-            return context.User.Count();
         }
 
         public Event GetEventbyId(int eventId)
@@ -112,18 +95,14 @@ namespace Event_Management.Repository
         }
 
 
-        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime, string? imagePath)
+        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime, string ImagePath)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventID == id);
             if (evt == null)
                 return 0;
 
             if (!string.IsNullOrWhiteSpace(name))
-                // FIX: Only throw exception if the name exists on a DIFFERENT event ID
-                if (context.Event.Any(e => e.EventName == name && e.EventID != id))
-                    throw new EventAlreadyExistsException(name);
-                else
-                    evt.EventName = name;
+                evt.EventName = name;
 
             if (!string.IsNullOrWhiteSpace(description))
                 evt.Description = description;
@@ -144,9 +123,6 @@ namespace Event_Management.Repository
                 evt.TotalSeats = TotalSeats;
             if (PricePerTicket > 0)
                 evt.PricePerTicket = PricePerTicket;
-
-            if (!string.IsNullOrWhiteSpace(imagePath))
-                evt.ImagePath = imagePath;
 
 
             context.Event.Update(evt);

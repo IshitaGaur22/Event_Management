@@ -14,6 +14,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using Event_Management.Hubs; // Assuming you create NotificationHub.cs in Hubs folder
 
 namespace Event_Management.Controllers
 {
@@ -24,10 +26,14 @@ namespace Event_Management.Controllers
     {
 
         private readonly IBookingService _bookingService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public BookingsController(IBookingService bookingService)
+        public BookingsController(IBookingService bookingService, IHubContext<NotificationHub> hubContext)
         {
+
             _bookingService = bookingService;
+            _hubContext = hubContext;
+
         }
 
         //Post
@@ -60,6 +66,11 @@ namespace Event_Management.Controllers
             try
             {
                 var summary = _bookingService.AddBooking(dto.SelectedSeats, dto.UserId, dto.EventId);
+                //var summary = _bookingService.AddBooking(selectedSeats, userName, eventId);
+
+                // ✅ Send real-time notification
+                _hubContext.Clients.All.SendAsync("ReceiveNotification", $"Booking confirmed for {dto.UserName} on Event ID {dto.EventId}");
+
                 return Ok(summary);
             }
             catch (Exception ex)

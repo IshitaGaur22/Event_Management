@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Event_Management.Migrations
 {
     [DbContext(typeof(Event_ManagementContext))]
-<<<<<<<< HEAD:Event_Management/Migrations/20251107124009_event.Designer.cs
-    [Migration("20251107124009_event")]
-    partial class @event
-========
-    [Migration("20251107083524_m1")]
-    partial class m1
->>>>>>>> 416ec1f84325287fdb574c4f69c24a87351efca5:Event_Management/Migrations/20251107083524_m1.Designer.cs
+    [Migration("20251110083506_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -160,8 +155,6 @@ namespace Event_Management.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("EventID");
-
-                    b.HasIndex("CategoryID");
 
                     b.ToTable("Event");
                 });
@@ -326,9 +319,6 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OrganisationName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -367,15 +357,6 @@ namespace Event_Management.Migrations
                     b.Navigation("Event");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Event", b =>
-                {
-                    b.HasOne("Event_Management.Models.Category", null)
-                        .WithMany("Events")
-                        .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Event_Management.Models.Feedback", b =>
@@ -428,11 +409,6 @@ namespace Event_Management.Migrations
                         .IsRequired();
 
                     b.Navigation("Feedback");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Category", b =>
-                {
-                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }

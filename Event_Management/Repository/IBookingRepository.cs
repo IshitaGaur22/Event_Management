@@ -33,5 +33,9 @@ namespace Event_Management.Repository
         //Delete
         int DeleteBooking(int id);
 
+
+        IEnumerable<Event> GetEventsStartingSoon(int minutes);
+        IEnumerable<User> GetUsersForEvent(int eventId);
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using Event_Management.Auth;
+﻿using BCrypt;
+using Event_Management.Auth;
 using Event_Management.DTOs;
 using Event_Management.Models;
 using Event_Management.Repository;

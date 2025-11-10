@@ -153,8 +153,6 @@ namespace Event_Management.Migrations
 
                     b.HasKey("EventID");
 
-                    b.HasIndex("CategoryID");
-
                     b.ToTable("Event");
                 });
 
@@ -318,9 +316,6 @@ namespace Event_Management.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OrganisationName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -359,15 +354,6 @@ namespace Event_Management.Migrations
                     b.Navigation("Event");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Event", b =>
-                {
-                    b.HasOne("Event_Management.Models.Category", null)
-                        .WithMany("Events")
-                        .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Event_Management.Models.Feedback", b =>
@@ -420,11 +406,6 @@ namespace Event_Management.Migrations
                         .IsRequired();
 
                     b.Navigation("Feedback");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Category", b =>
-                {
-                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }
