@@ -5,7 +5,6 @@ using Event_Management.Repository;
 using Microsoft.AspNetCore.Identity.Data;
 using Org.BouncyCastle.Crypto.Generators;
 using BCrypt;
-using Event_Management.Auth;
 using System.Security.Authentication;
 
 namespace Event_Management.Services

@@ -8,5 +8,6 @@
         public EventsNotFoundException(DateOnly date)
             : base($"Event with date '{date}' was not found.") { }
 
+        public EventsNotFoundException(int eventId) : base($"Event with ID {eventId} not found.") { }
     }
 }

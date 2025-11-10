@@ -39,7 +39,11 @@ namespace Event_Management.Services
             return _repository.SubmitFeedback(feedback);
 
         }
-
+        public IEnumerable<Event> GetBookedEventsForUser(int userId)
+        {
+            var booked = _repository.GetBookedEventsForUser(userId);
+            return booked;
+        }
         public IEnumerable<object> GetTopRatedEvents()
         {
             var topEvents = _repository.GetTopRatedEvents();

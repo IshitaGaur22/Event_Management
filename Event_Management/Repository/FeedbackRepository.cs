@@ -32,7 +32,7 @@ namespace Event_Management.Repository
         public bool HasUserAttendedEvent(int userId, int eventId)
         {
             return _context.Booking
-                .Any(b => b.UserId == userId && b.EventId == eventId && b.Status=="Attended");
+                .Any(b => b.UserId == userId && b.EventId == eventId && b.Status=="Completed");
         }
         public bool HasUserAlreadySubmittedFeedback(int userId, int eventId)
         {
@@ -66,6 +66,7 @@ namespace Event_Management.Repository
                 .Where(f => !f.IsArchived)
                 .GroupBy(f => new { f.EventId, f.Event.EventName })
                 .Where(g => g.Count() >= 2)
+                .Where(g=>g.Average(f=>f.Rating)>3)
                 .OrderByDescending(g => g.Average(f => f.Rating))
                 .Select(g => new
                 {
@@ -90,10 +91,10 @@ namespace Event_Management.Repository
 
             var ratingDistribution = _context.Feedback
                 .Where(f => f.EventId == eventId && !f.IsArchived)
-                .GroupBy(f => f.Rating) // Group by the rating itself
+                .GroupBy(f => f.Rating) 
                 .Select(g => new
                 {
-                    Rating = g.Key, // The rating (1, 2, 3, 4, 5)
+                    Rating = g.Key, // The rating
                     Count = g.Count() // How many people gave this rating
                 })
                 .ToList();
@@ -104,7 +105,7 @@ namespace Event_Management.Repository
                     {
                         TotalFeedback = 0,
                         AverageRating = 0.0,
-                        RatingDistribution = new List<object>() // Empty list
+                        RatingDistribution = new List<object>() 
                     };
                 }
 
@@ -112,7 +113,7 @@ namespace Event_Management.Repository
                 {
                     summary.TotalFeedback,
                     summary.AverageRating,
-                    RatingDistribution = ratingDistribution // Add the new data here
+                    RatingDistribution = ratingDistribution 
                 };
         }
         public IEnumerable<object> GetFilteredFeedbacks(
@@ -207,6 +208,23 @@ namespace Event_Management.Repository
             feed.IsArchived = false;
             return _context.SaveChanges();
         }
+        // This method should be in your BookingService or BookingRepository
+        // It assumes you have a DbSet for Events called _context.Events
+        // and that your Booking model has a 'UserId' and 'EventId' property.
 
+        public IEnumerable<Event> GetBookedEventsForUser(int userId)
+        {
+            var bookedEventIds = _context.Booking
+                                         .Where(b => b.UserId == userId)
+                                         .Select(b => b.EventId) 
+                                         .ToList();
+            if (!bookedEventIds.Any())
+            {
+                return new List<Event>(); 
+            }
+            return _context.Event
+                           .Where(e => bookedEventIds.Contains(e.EventID)) 
+                           .ToList();
+        }
     }
 }

@@ -20,5 +20,6 @@ namespace Event_Management.Services
         public int SubmitReply(int feedbackId, ReplyDto reply);
         public int ArchiveFeedback(int feedbackId);
         public int UnArchiveFeedback(int feedbackId);
+        public IEnumerable<Event> GetBookedEventsForUser(int userId);
     }
 }
