@@ -13,7 +13,7 @@ namespace Event_Management.Repository
         int AddBooking(Booking booking);
         Event GetLatestTicket();
         Event GetEventById(int eventId);
-        User GetUserByUsername(string username);
+        User GetUserById(int userId);
         IEnumerable<Booking> GetBookingByName(string username);
         object GetSeats(int id);
         IEnumerable<Booking> GetBookingsByEvent(int eventId);

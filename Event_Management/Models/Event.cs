@@ -1,16 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Drawing;
+using System.Text.Json.Serialization;
 
 namespace Event_Management.Models
-
 {
-
-    public class Event
+    public class Event : IValidatableObject
     {
-
         [Key]
-
         public int EventID { get; set; }
 
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Event name must be at least 3 characters.")]
@@ -18,14 +14,13 @@ namespace Event_Management.Models
 
         public string Description { get; set; }
 
-
         [Required(ErrorMessage = "Location is required.")]
         public string Location { get; set; }
 
         [Required(ErrorMessage = "Please Choose a category.")]
         public int CategoryID { get; set; }
 
-        public Category Category { get; set; }
+
         [Required]
         public int TotalSeats { get; set; }
 
@@ -36,13 +31,11 @@ namespace Event_Management.Models
         [FutureOrTodayDate]
         public DateOnly EventDate { get; set; }
 
-
         [Required(ErrorMessage = "Please enter a valid time.")]
         [FutureTime]
         public TimeOnly EventTime { get; set; }
 
-
-        [Required(ErrorMessage = "Enter End Time")]
+        [Required(ErrorMessage = "End Time should be taken after the start time")]
         public TimeOnly EndTime { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -52,6 +45,9 @@ namespace Event_Management.Models
                 yield return new ValidationResult("End time must be after start time.", new[] { nameof(EndTime) });
             }
         }
+
+        public string? ImagePath { get; set; } = null;
+
     }
 
     public class FutureOrTodayDateAttribute : ValidationAttribute
@@ -72,15 +68,27 @@ namespace Event_Management.Models
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value is TimeOnly time)
+            if (value is not TimeOnly time)
+                return ValidationResult.Success;
+
+            var instance = validationContext.ObjectInstance;
+            var type = validationContext.ObjectType;
+            var dateProp = type.GetProperty("EventDate");
+
+            if (dateProp == null || dateProp.GetValue(instance) is not DateOnly eventDate)
+                return ValidationResult.Success;
+
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var now = TimeOnly.FromDateTime(DateTime.Now);
+            var nextHour = now.AddHours(1);
+
+            // If the event is today, time must be at least one hour ahead
+            if (eventDate == today && time < nextHour)
             {
-                var now = TimeOnly.FromDateTime(DateTime.Now);
-                var nextHour = now.AddHours(1);
-                if (time < nextHour)
-                    return new ValidationResult("Start time must be at least one hour from now.");
+                return new ValidationResult("Start time must be at least one hour from now.");
             }
+
             return ValidationResult.Success;
         }
     }
-
 }

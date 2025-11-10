@@ -22,6 +22,42 @@ namespace Event_Management.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Event_Management.DTOs.EventRevenueDto", b =>
+                {
+                    b.Property<int>("EventID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventID"));
+
+                    b.Property<decimal>("ActualRevenue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("EstimatedRevenue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateOnly>("EventDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("EventName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("PricePerTicket")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TotalSeats")
+                        .HasColumnType("int");
+
+                    b.HasKey("EventID");
+
+                    b.ToTable("EventRevenueDto");
+                });
+
             modelBuilder.Entity("Event_Management.Models.Booking", b =>
                 {
                     b.Property<int>("BookingId")
@@ -41,7 +77,8 @@ namespace Event_Management.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -100,6 +137,9 @@ namespace Event_Management.Migrations
 
                     b.Property<TimeOnly>("EventTime")
                         .HasColumnType("time");
+
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -319,13 +359,11 @@ namespace Event_Management.Migrations
 
             modelBuilder.Entity("Event_Management.Models.Event", b =>
                 {
-                    b.HasOne("Event_Management.Models.Category", "Category")
-                        .WithMany()
+                    b.HasOne("Event_Management.Models.Category", null)
+                        .WithMany("Events")
                         .HasForeignKey("CategoryID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Event_Management.Models.Feedback", b =>
@@ -378,6 +416,11 @@ namespace Event_Management.Migrations
                         .IsRequired();
 
                     b.Navigation("Feedback");
+                });
+
+            modelBuilder.Entity("Event_Management.Models.Category", b =>
+                {
+                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }

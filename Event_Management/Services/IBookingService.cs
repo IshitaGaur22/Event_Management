@@ -6,13 +6,13 @@ namespace Event_Management.Services
     public interface IBookingService
     {
         //Post
-        BookingSummary AddBooking(int selectedSeats, string userName, int eventId);
+        BookingSummary AddBooking(int selectedSeats, int userId, int eventId);
 
         //Get
         IEnumerable<Booking> GetAllBookings();
         Booking GetBookingById(int id);
         public void UpdateBooking(Booking booking);
-        User GetUserByUsername(string username);
+        User GetUserById(int userId);
         IEnumerable<Booking> GetBookingByName(string username);
         object GetSeats(int id);
         bool IsSeatAvailable(int eventId, int requestedSeats);

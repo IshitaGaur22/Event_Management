@@ -38,9 +38,9 @@ namespace Event_Management.Repository
             return _context.Event.OrderByDescending(t => t.EventID).FirstOrDefault();
         }
 
-        public User GetUserByUsername(string name)
+        public User GetUserById(int userId)
         {
-            return _context.User.FirstOrDefault(u => u.UserName == name);
+            return _context.User.FirstOrDefault(u => u.UserId == userId);
         }
 
         public IEnumerable<Booking> GetBookingByName(string username)
@@ -76,7 +76,7 @@ namespace Event_Management.Repository
         {
             return _context.Booking
                 .Include(b => b.Event)
-                .Where(b => b.Status == "Pending")
+                .Where(b => b.Status == "Upcoming")
                 .ToList();
         }
 
@@ -122,7 +122,7 @@ namespace Event_Management.Repository
             _context.Booking.UpdateRange(bookings);
             return _context.SaveChanges();
         }
-        
+
 
         //Delete
         public int DeleteBooking(int id)

@@ -19,7 +19,7 @@ namespace Event_Management.Services
         }
 
         // Post
-        public BookingSummary AddBooking(int selectedSeats, string userName, int eventId)
+        public BookingSummary AddBooking(int selectedSeats, int userId, int eventId)
         {
             var ev = _bookingRepository.GetEventById(eventId);
 
@@ -29,10 +29,10 @@ namespace Event_Management.Services
             if (selectedSeats <= 0 || selectedSeats > ev.TotalSeats)
                 throw new SeatsUnavailableException(eventId, selectedSeats, ev.TotalSeats);
 
-            var user = _bookingRepository.GetUserByUsername(userName);
+            var user = _bookingRepository.GetUserById(userId);
 
             if (user == null)
-                throw new UserNotFoundException(userName);
+                throw new UserNotFoundException($"UserId: {userId}");
 
             // Create Booking
             var booking = new Booking
@@ -91,11 +91,11 @@ namespace Event_Management.Services
             return booking;
         }
 
-        public User GetUserByUsername(string username)
+        public User GetUserById(int userId)
         {
-            var user = _bookingRepository.GetUserByUsername(username);
+            var user = _bookingRepository.GetUserById(userId);
             if (user == null)
-                throw new UserNotFoundException(username);
+                throw new UserNotFoundException();
             return user;
         }
 
@@ -157,10 +157,10 @@ namespace Event_Management.Services
             var currentTime = TimeOnly.FromDateTime(now);
 
             var bookingsToUpdate = _bookingRepository.GetPendingBookingsWithEvents()
-                .Where(b => b.Event != null && (b.Event.EventDate < today ||
-                               (b.Event.EventDate == today && b.Event.EndTime <= currentTime)))
+                .Where(b => b.Event != null &&
+                           (b.Event.EventDate < today ||
+                           (b.Event.EventDate == today && b.Event.EndTime <= currentTime)))
                 .ToList();
-
 
             foreach (var booking in bookingsToUpdate)
             {
@@ -169,6 +169,7 @@ namespace Event_Management.Services
 
             return _bookingRepository.SaveUpdatedBookings(bookingsToUpdate);
         }
+
 
         public void UpdateBooking(int id, UpdateBookingDto bookingDto)
 
