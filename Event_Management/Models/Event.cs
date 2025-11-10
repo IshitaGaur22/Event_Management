@@ -91,9 +91,6 @@ namespace Event_Management.Models
 
             return ValidationResult.Success;
 
-
-
-
         }
     }
 }
