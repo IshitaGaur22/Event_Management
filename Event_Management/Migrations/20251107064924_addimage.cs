@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Event_Management.Migrations
 {
     /// <inheritdoc />
+<<<<<<<< HEAD:Event_Management/Migrations/20251107124009_event.cs
+    public partial class @event : Migration
+========
     public partial class addimage : Migration
+>>>>>>>> 416ec1f84325287fdb574c4f69c24a87351efca5:Event_Management/Migrations/20251107064924_addimage.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

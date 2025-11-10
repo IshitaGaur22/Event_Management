@@ -12,8 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Event_Management.Migrations
 {
     [DbContext(typeof(Event_ManagementContext))]
+<<<<<<<< HEAD:Event_Management/Migrations/20251107124009_event.Designer.cs
+    [Migration("20251107124009_event")]
+    partial class @event
+========
     [Migration("20251107083524_m1")]
     partial class m1
+>>>>>>>> 416ec1f84325287fdb574c4f69c24a87351efca5:Event_Management/Migrations/20251107083524_m1.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -171,7 +176,8 @@ namespace Event_Management.Migrations
 
                     b.Property<string>("Comments")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("ContentQuality")
                         .HasColumnType("int");
@@ -318,6 +324,9 @@ namespace Event_Management.Migrations
 
                     b.Property<string>("Location")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrganisationName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")

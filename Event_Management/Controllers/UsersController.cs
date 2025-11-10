@@ -34,7 +34,6 @@ namespace Event_Management.Controllers
         }
 
 
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
@@ -45,7 +44,7 @@ namespace Event_Management.Controllers
                 var result = await _userService.LoginAsync(dto);
                 return Ok(result);
             }
-            catch(InvalidCredentialException ex)
+            catch (InvalidCredentialException ex)
             {
                 return Unauthorized(ex.Message);
             }
@@ -69,5 +68,3 @@ namespace Event_Management.Controllers
         }
     }
 }
-
-
