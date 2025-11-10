@@ -1,32 +1,39 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Net.Sockets;
 
 namespace Event_Management.Models
 {
     public class Booking
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Display(Name = "Booking ID")]
         public int BookingId { get; set; }
+
+        [Required(ErrorMessage = "User ID is required.")]
         [ForeignKey(nameof(User))]
+        [Display(Name = "User ID")]
         public int UserId { get; set; }
 
+        [Required(ErrorMessage = "Event ID is required.")]
         [ForeignKey(nameof(Event))]
+        [Display(Name = "Event ID")]
         public int EventId { get; set; }
 
-        //[ForeignKey(nameof(Ticket))]
-        //public int TicketId { get; set; }
-
-        [Required]
-        [Range(1, int.MaxValue)]
+        [Required(ErrorMessage = "Selected Seats count is required.")]
+        [Range(1, 1000, ErrorMessage = "Selected Seats must be between 1 and 1000.")]
+        [Display(Name = "Seats Booked")]
         public int SelectedSeats { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Booking Date is required.")]
+        [DataType(DataType.DateTime)]
+        [Display(Name = "Booking Date")]
         public DateTime BookingDate { get; set; }
 
-        [Required]
-        public string Status { get; set; } = "Successful"; // Default before payment
+        [Required(ErrorMessage = "Status is required.")]
+        [StringLength(50, ErrorMessage = "Status cannot exceed 50 characters.")]
+        public string Status { get; set; } = "Upcoming"; 
 
-        //public virtual Ticket Ticket { get; set; }
         public virtual Event Event { get; set; }
         public virtual User User { get; set; }
     }

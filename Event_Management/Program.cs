@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Event_Management.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,17 +20,16 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());//to convert enum values to their string representation in JSON responses
     });
-string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-builder.Services.AddCors(options =>
+
+builder.Services.AddCors(options=>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins("http://localhost:3000") 
-                                .AllowAnyHeader()
-                                .AllowAnyMethod();
-                      });
+    options.AddPolicy("MyCorsPolicy", builder =>
+    {
+        builder.WithOrigins("http://localhost:3000").AllowAnyMethod()
+        .AllowAnyHeader();
+    });
 });
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;//specifies the default authentication scheme to be used by the application
@@ -71,6 +71,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddHostedService<BookingStatusUpdater>();
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -108,14 +109,13 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();//to redirect HTTP requests to HTTPS.
 app.UseAuthentication();
 
-app.UseAuthorization();//to enable authorization middleware, which checks if the user is authorized to access certain resources.
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();//to map controller routes to the corresponding controller actions.
 
-app.UseMiddleware<ExceptionMiddleware>();//to add custom exception handling middleware to the application's request pipeline.
-
-app.UseRouting();
-
-app.UseCors(MyAllowSpecificOrigins);
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseCors("MyCorsPolicy");
 
 app.Run();//to run the application and start listening for incoming HTTP requests.
