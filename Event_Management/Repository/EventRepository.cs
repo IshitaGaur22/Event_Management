@@ -22,14 +22,14 @@ namespace Event_Management.Repository
         {
             var evt = context.Event.FirstOrDefault(e => e.EventName == ev.EventName);
 
-            
+
             var categoryExists = context.Category.Any(c => c.CategoryID == ev.CategoryID);
             if (!categoryExists)
             {
                 throw new CategoryNotFoundException();
             }
 
-            
+
             if (evt != null)
             {
                 return 0;
@@ -92,21 +92,25 @@ namespace Event_Management.Repository
         {
             var evt = context.Event.FirstOrDefault(e => e.EventName == eventName);
             if (evt == null)
-                throw new EventsNotFoundException(eventName); 
+                throw new EventsNotFoundException(eventName);
 
             context.Event.Remove(evt);
             context.SaveChanges();
         }
 
 
-        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime)
+        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime, string? imagePath)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventID == id);
             if (evt == null)
                 return 0;
 
             if (!string.IsNullOrWhiteSpace(name))
-                evt.EventName = name;
+                // FIX: Only throw exception if the name exists on a DIFFERENT event ID
+                if (context.Event.Any(e => e.EventName == name && e.EventID != id))
+                    throw new EventAlreadyExistsException(name);
+                else
+                    evt.EventName = name;
 
             if (!string.IsNullOrWhiteSpace(description))
                 evt.Description = description;
@@ -123,19 +127,22 @@ namespace Event_Management.Repository
             if (endTime.HasValue)
                 evt.EndTime = endTime.Value;
 
-            if (TotalSeats>0)
+            if (TotalSeats > 0)
                 evt.TotalSeats = TotalSeats;
-            if (PricePerTicket>0)
+            if (PricePerTicket > 0)
                 evt.PricePerTicket = PricePerTicket;
 
-          
+            if (!string.IsNullOrWhiteSpace(imagePath))
+                evt.ImagePath = imagePath;
+
+
             context.Event.Update(evt);
             return context.SaveChanges();
         }
 
         public Event GetEventByName(string eventName) =>
     context.Event.SingleOrDefault(e =>
-        e.EventName==eventName);
+        e.EventName == eventName);
 
         public List<Event> GetEventById(int id) => context.Event
             .Where(e => e.EventID == id)

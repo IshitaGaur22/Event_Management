@@ -50,8 +50,8 @@ namespace Event_Management.Services
             if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
                 throw new InvalidCredentialException("Invalid password");
 
-            
-            var token= _tokenService.CreateToken(user);
+
+            var token = _tokenService.CreateToken(user);
             return new LoginResponse
             {
                 Token = token,
@@ -76,7 +76,7 @@ namespace Event_Management.Services
             await _usersRepository.UpdateUserAsync(user);
         }
 
-        
+
 
         public Task<string> RegisterAsync(User user)
         {
