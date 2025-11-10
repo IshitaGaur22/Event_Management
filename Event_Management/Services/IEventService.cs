@@ -18,6 +18,6 @@ namespace Event_Management.Services
         public List<Event> FetchEventLocation(string location);
         public List<Event> FetchEventDate(DateOnly date);
         public IEnumerable<Event> GetAllEvents();
-
+        
     }
 }

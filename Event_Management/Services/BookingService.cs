@@ -37,7 +37,7 @@ namespace Event_Management.Services
             // Create Booking
             var booking = new Booking
             {
-                EventId = ev.EventID,
+                EventId = eventId,
                 UserId = user.UserId,
                 SelectedSeats = selectedSeats,
                 BookingDate = DateTime.Now,

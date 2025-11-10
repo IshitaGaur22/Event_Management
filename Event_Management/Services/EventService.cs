@@ -1,4 +1,4 @@
-﻿using Event_Management.DTOs;
+using Event_Management.DTOs;
 using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Repository;
@@ -9,32 +9,32 @@ namespace Event_Management.Services
     public class EventService : IEventService
     {
         private readonly IEventRepository repository;
-
+ 
         public EventService(IEventRepository repo)
         {
             repository = repo;
         }
-
+ 
         public int CreateEvent(Event ev)
         {
             if (repository.GetEvent(ev.EventName) == 1)
                 throw new EventAlreadyExistsException(ev.EventName);
-
+ 
             try
             {
                 return repository.AddEvent(ev);
             }
             catch (CategoryNotFoundException)
             {
-                throw new CategoryNotFoundException();
+                throw new CategoryNotFoundException(); 
             }
             catch (Exception ex)
             {
                 throw new EventCreationException(ex.Message);
             }
         }
-
-
+ 
+ 
         public Event GetEventbyId(int id)
         {
             var ticket = repository.GetEventbyId(id);
@@ -43,13 +43,13 @@ namespace Event_Management.Services
             return ticket;
         }
         //public IEnumerable<Event> GetAllTickets() => repository.GetAllTickets();
-
+ 
         public List<EventRevenueDto> GetEventRevenueSummary()
         {
             return repository.GetEventRevenueSummary();
         }
-
-
+ 
+ 
         public void Delete(string eventName)
         {
             if (repository.GetEvent(eventName) == 0)
@@ -62,7 +62,7 @@ namespace Event_Management.Services
             {
                 throw new EventDeletionException(eventName);
             }
-
+ 
         }
         public int GetTotalEvents()
         {
@@ -72,7 +72,7 @@ namespace Event_Management.Services
         {
             return repository.GetTotalBookings();
         }
-
+ 
         public decimal GetTotalRevenue()
         {
             return repository.GetTotalRevenue();
@@ -81,9 +81,9 @@ namespace Event_Management.Services
         {
             return repository.GetTotalNoOfUsers();
         }
-
-
-        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime)
+ 
+ 
+        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket,DateOnly? date, TimeOnly? time,  TimeOnly? endTime)
         {
             try
             {
@@ -101,15 +101,15 @@ namespace Event_Management.Services
                 throw new EventUpdateException($"An error occurred while updating event ID {id}.");
             }
         }
-
-
+ 
+ 
         public Event FetchEventName(string eventName)
         {
             var eventDetails = repository.GetEventByName(eventName);
-
+ 
             if (eventDetails == null)
                 throw new EventsNotFoundException(eventName);
-
+ 
             return eventDetails;
         }
 
@@ -122,7 +122,7 @@ namespace Event_Management.Services
             if (eventDetails == null)
                 throw new EventsNotFoundException(location);
             return eventDetails;
-
+ 
         }
         public List<Event> FetchEventDate(DateOnly date)
         {
@@ -130,10 +130,10 @@ namespace Event_Management.Services
             if (eventDetails == null)
                 throw new EventsNotFoundException(date);
             return eventDetails;
-
+ 
         }
         public IEnumerable<Event> GetAllEvents() => repository.GetAllEvents();
-
-
+ 
+ 
     }
 }

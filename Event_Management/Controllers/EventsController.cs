@@ -124,9 +124,9 @@ namespace Event_Management.Controllers
                 var totalBookings = service.GetTotalBookings();
                 return Ok(totalBookings);
             }
-            catch (BookingNotFoundException ex)
+            catch(BookingNotFoundException ex)
             {
-                return NotFound(new { error = ex.Message });
+                return NotFound(new { error = ex.Message});
             }
         }
         [HttpGet("Total Revenue Generated")]
@@ -136,7 +136,7 @@ namespace Event_Management.Controllers
             try
             {
                 var totalRevenue = service.GetTotalRevenue();
-                return Ok(totalRevenue);
+            return Ok(totalRevenue);
             }
             catch (BookingNotFoundException ex)
             {
@@ -157,7 +157,7 @@ namespace Event_Management.Controllers
             //    return NotFound(new { error = ex.Message });
             //}
         }
-
+        
 
 
         [HttpGet]

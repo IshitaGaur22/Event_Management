@@ -1,7 +1,11 @@
-﻿using Event_Management.Data;
+﻿using System.Security.Claims;
+using Event_Management.Data;
+using Event_Management.ExceptionHandlers;
 using Event_Management.Exceptions;
 using Event_Management.Repository;
 using Event_Management.Services;
+using Event_Management.Auth;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,15 +13,12 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Event_Management.Auth;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());//to convert enum values to their string representation in JSON responses
     });
 
 builder.Services.AddCors(options=>
@@ -31,46 +32,29 @@ builder.Services.AddCors(options=>
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;//specifies the default authentication scheme to be used by the application
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
+    // --- THIS IS THE CRITICAL FIX ---
+    // You were missing this entire section.
+    // This tells the API how to validate the token.
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:UserWebAPI"],
-        ValidAudience = builder.Configuration["Jwt:EventManagementUser"],
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        RoleClaimType = ClaimTypes.Role // This tells .NET to read the "role" claim
     };
+    // ----------------------------------
 });
 
-
-//builder.Services.Configure<ApiBehaviorOptions>(options =>
-//{
-//    options.InvalidModelStateResponseFactory = context =>
-//    {
-
-//        if (!context.ModelState.IsValid &&
-//            context.ModelState.Values.All(v => v.Errors.Count > 0))
-//        {
-//            return new BadRequestObjectResult(new
-//            {
-//                error = "Value has not been entered, please enter values."
-//            });
-//        }
-
-//        return new BadRequestObjectResult(new
-//        {
-//            error = "Invalid model state.",
-//            details = context.ModelState
-//        });
-//    };
-//});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -79,8 +63,8 @@ builder.Services.AddDbContext<Event_ManagementContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Event_ManagementContext")));
 
 builder.Services.AddScoped<IEventRepository, EventRepository>();
+//to register the EventRepository class as the implementation of the IEventRepository interface in the dependency injection container.
 builder.Services.AddScoped<IEventService, EventService>();
-
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -101,28 +85,37 @@ builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 
 builder.Services.AddScoped<IBookingHistoryRepository, BookingHistoryRepository>();
 builder.Services.AddScoped<IBookingHistoryService, BookingHistoryService>();
+
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
 builder.Services.AddScoped<IEmailService, EmailService>();
+//why not add transient?
+//because we want to maintain a single instance of the email service throughout the request lifecycle.
 
 
-var app = builder.Build();
+var app = builder.Build();//Builds the WebApplication instance using the configured services and middleware.
+
+if (app.Environment.IsDevelopment())//to check if the application is running in a development environment
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger();//to enable middleware for serving the generated Swagger as a JSON endpoint.
     app.UseSwaggerUI();
+//to enable middleware for serving the Swagger UI, which provides a web-based interface for exploring and testing the API endpoints.
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection();//to redirect HTTP requests to HTTPS.
+app.UseAuthentication();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers();//to map controller routes to the corresponding controller actions.
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("MyCorsPolicy");
 
-app.Run();
+app.Run();//to run the application and start listening for incoming HTTP requests.

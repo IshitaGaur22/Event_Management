@@ -1,6 +1,7 @@
 ﻿using Event_Management.DTOs;
 using Event_Management.Models;
 using Event_Management.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Authentication;
@@ -44,7 +45,7 @@ namespace Event_Management.Controllers
                 var result = await _userService.LoginAsync(dto);
                 return Ok(result);
             }
-            catch (InvalidCredentialException ex)
+            catch(InvalidCredentialException ex)
             {
                 return Unauthorized(ex.Message);
             }
