@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Event_Management.Migrations
 {
     [DbContext(typeof(Event_ManagementContext))]
-    [Migration("20251107083524_m1")]
-    partial class m1
+    [Migration("20251110083506_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -156,8 +156,6 @@ namespace Event_Management.Migrations
 
                     b.HasKey("EventID");
 
-                    b.HasIndex("CategoryID");
-
                     b.ToTable("Event");
                 });
 
@@ -171,7 +169,8 @@ namespace Event_Management.Migrations
 
                     b.Property<string>("Comments")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("ContentQuality")
                         .HasColumnType("int");
@@ -360,15 +359,6 @@ namespace Event_Management.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Event_Management.Models.Event", b =>
-                {
-                    b.HasOne("Event_Management.Models.Category", null)
-                        .WithMany("Events")
-                        .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Event_Management.Models.Feedback", b =>
                 {
                     b.HasOne("Event_Management.Models.Event", "Event")
@@ -419,11 +409,6 @@ namespace Event_Management.Migrations
                         .IsRequired();
 
                     b.Navigation("Feedback");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Category", b =>
-                {
-                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }

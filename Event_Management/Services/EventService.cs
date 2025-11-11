@@ -1,4 +1,4 @@
-﻿using Event_Management.DTOs;
+using Event_Management.DTOs;
 using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Repository;
@@ -9,17 +9,14 @@ namespace Event_Management.Services
     public class EventService : IEventService
     {
         private readonly IEventRepository repository;
-
         public EventService(IEventRepository repo)
         {
             repository = repo;
         }
-
         public int CreateEvent(Event ev)
         {
             if (repository.GetEvent(ev.EventName) == 1)
                 throw new EventAlreadyExistsException(ev.EventName);
-
             try
             {
                 return repository.AddEvent(ev);
@@ -34,7 +31,6 @@ namespace Event_Management.Services
             }
         }
 
-
         public Event GetEventbyId(int id)
         {
             var ticket = repository.GetEventbyId(id);
@@ -43,12 +39,10 @@ namespace Event_Management.Services
             return ticket;
         }
         //public IEnumerable<Event> GetAllTickets() => repository.GetAllTickets();
-
         public List<EventRevenueDto> GetEventRevenueSummary()
         {
             return repository.GetEventRevenueSummary();
         }
-
 
         public void Delete(string eventName)
         {
@@ -62,7 +56,6 @@ namespace Event_Management.Services
             {
                 throw new EventDeletionException(eventName);
             }
-
         }
         public int GetTotalEvents()
         {
@@ -72,7 +65,6 @@ namespace Event_Management.Services
         {
             return repository.GetTotalBookings();
         }
-
         public decimal GetTotalRevenue()
         {
             return repository.GetTotalRevenue();
@@ -107,17 +99,13 @@ namespace Event_Management.Services
             }
         }
 
-
         public Event FetchEventName(string eventName)
         {
             var eventDetails = repository.GetEventByName(eventName);
-
             if (eventDetails == null)
                 throw new EventsNotFoundException(eventName);
-
             return eventDetails;
         }
-
 
 
 
@@ -127,7 +115,6 @@ namespace Event_Management.Services
             if (eventDetails == null)
                 throw new EventsNotFoundException(location);
             return eventDetails;
-
         }
         public List<Event> FetchEventDate(DateOnly date)
         {
@@ -135,10 +122,8 @@ namespace Event_Management.Services
             if (eventDetails == null)
                 throw new EventsNotFoundException(date);
             return eventDetails;
-
         }
         public IEnumerable<Event> GetAllEvents() => repository.GetAllEvents();
-
 
     }
 }

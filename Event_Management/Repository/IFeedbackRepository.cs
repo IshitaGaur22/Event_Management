@@ -14,14 +14,17 @@ namespace Event_Management.Repository
         bool HasUserAlreadySubmittedFeedback(int userId, int eventId);
         IEnumerable<object> GetTopRatedEvents();
         object GetFeedbackSummary(int eventId);
-        List<Feedback> GetFilteredFeedbacks(string? eventName,
+        IEnumerable<object> GetFilteredFeedbacks(string? eventName,
                     int? minRating,
                     DateTime? startDate,
                     DateTime? endDate,
-                    string? search);
+                    string? search,
+                    SortByOptions sortBy,
+                    SortOrderOptions sortOrder);
         Replies GetReplyById(int id);
         int AddReply(int feedbckId, ReplyDto reply);
         int ArchiveFeedback(int feedbackId);
         int UnArchiveFeedback(int feedbackId);
+        IEnumerable<Event> GetBookedEventsForUser(int userId);
     }
 }

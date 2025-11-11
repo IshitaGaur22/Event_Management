@@ -39,7 +39,11 @@ namespace Event_Management.Services
             return _repository.SubmitFeedback(feedback);
 
         }
-
+        public IEnumerable<Event> GetBookedEventsForUser(int userId)
+        {
+            var booked = _repository.GetBookedEventsForUser(userId);
+            return booked;
+        }
         public IEnumerable<object> GetTopRatedEvents()
         {
             var topEvents = _repository.GetTopRatedEvents();
@@ -54,18 +58,18 @@ namespace Event_Management.Services
         {
             return _repository.GetFeedbackSummary(eventId);
         }
-        public List<Feedback> GetFilteredFeedbacks(
+        public IEnumerable<object> GetFilteredFeedbacks(
                     string? eventName,
                     int? minRating,
                     DateTime? startDate,
                     DateTime? endDate,
                     string? search,
-                    string sortBy,
-                    string sortOrder)
+                    SortByOptions sortBy,
+                    SortOrderOptions sortOrder)
         {
-            var feedbackList = _repository.GetFilteredFeedbacks(eventName, minRating, startDate, endDate, search);
+            var feedbackList = _repository.GetFilteredFeedbacks(eventName, minRating, startDate, endDate, search, sortBy, sortOrder);
 
-            if (feedbackList == null || feedbackList.Count == 0)
+            if (feedbackList == null)
             {
                 throw new FeedbackNotFound("No feedbacks found for the given filters.");
             }

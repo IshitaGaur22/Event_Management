@@ -1,6 +1,7 @@
 ﻿using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -8,6 +9,7 @@ namespace Event_Management.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[EnableCors("MyCorsPolicy")]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _service;
@@ -41,7 +43,6 @@ namespace Event_Management.Controllers
             if (cat == null)
                 return BadRequest("No values entered, please enter values.");
 
-
             try
             {
                 _service.CreateCategories(cat);
@@ -64,6 +65,10 @@ namespace Event_Management.Controllers
             try
             {
                 var c = _service.GetAllCategories();
+                if(!c.Any())
+                {
+                    return Ok("No Categories Found");
+                }
                 return Ok(c);
             }
             catch (CategoryNotFoundException ex)

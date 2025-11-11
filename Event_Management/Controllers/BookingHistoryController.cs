@@ -1,6 +1,9 @@
 ﻿using Event_Management.DTOs;
+using Event_Management.Hubs;
+using Event_Management.Models;
 using Event_Management.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Event_Management.Controllers
 {
@@ -9,10 +12,12 @@ namespace Event_Management.Controllers
     public class BookingHistoryController : ControllerBase
     {
         private readonly IBookingHistoryService _bookingService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public BookingHistoryController(IBookingHistoryService bookingService)
+        public BookingHistoryController(IBookingHistoryService bookingService, IHubContext<NotificationHub> hubContext)
         {
             _bookingService = bookingService;
+            _hubContext = hubContext;
         }
 
         [HttpGet("Upcoming/{userId}")]
@@ -49,6 +54,10 @@ namespace Event_Management.Controllers
             try
             {
                 await _bookingService.CancelBooking(bookingId);
+
+                //Send real-time notification
+                await _hubContext.Clients.All.SendAsync("ReceiveNotification", $"Booking ID {bookingId} has been cancelled.");
+
                 return Ok(new { message = "Booking cancelled successfully." });
             }
             catch (Exception ex)

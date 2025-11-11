@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Event_Management.Repository
 {
-    public class UsersRepository:IUsersRepository
+    public class UsersRepository : IUsersRepository
     {
         private readonly Event_ManagementContext _context;
 

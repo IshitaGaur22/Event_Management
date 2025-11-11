@@ -21,15 +21,11 @@ namespace Event_Management.Repository
         public int AddEvent(Event ev)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventName == ev.EventName);
-
-
             var categoryExists = context.Category.Any(c => c.CategoryID == ev.CategoryID);
             if (!categoryExists)
             {
                 throw new CategoryNotFoundException();
             }
-
-
             if (evt != null)
             {
                 return 0;
@@ -48,17 +44,17 @@ namespace Event_Management.Repository
             return context.Booking.Count();
         }
 
+        public int GetTotalNoOfUsers()
+        {
+            return context.User.Count();
+        }
+
         public decimal GetTotalRevenue()
         {
             return context.Booking
                 .Include(b => b.Event)
                 .Where(b => b.Event != null)
                 .Sum(b => b.SelectedSeats * b.Event.PricePerTicket);
-        }
-
-        public int GetTotalNoOfUsers()
-        {
-            return context.User.Count();
         }
 
         public Event GetEventbyId(int eventId)

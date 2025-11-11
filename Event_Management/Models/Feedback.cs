@@ -27,10 +27,11 @@ namespace Event_Management.Models
         [Range(1, 5, ErrorMessage = "Value for Money rating must be between 1 and 5.")]
         public int ValueForMoney { get; set; }
         [Required(ErrorMessage = "Comments cannot be empty.")]
+        [StringLength(1000, MinimumLength = 2)]
         public string Comments { get; set; }
         public DateTime SubmittedAt { get; set; } = DateTime.Now;
         public string? Reply { get; set; }
-        public DateTime? ReplyTime { get; set; } = DateTime.Now;
+        public DateTime? ReplyTime { get; set; } 
         public bool IsArchived { get; set; } = false;
         [ForeignKey("UserId")]
         public User User { get; set; }

@@ -153,8 +153,6 @@ namespace Event_Management.Migrations
 
                     b.HasKey("EventID");
 
-                    b.HasIndex("CategoryID");
-
                     b.ToTable("Event");
                 });
 
@@ -168,7 +166,8 @@ namespace Event_Management.Migrations
 
                     b.Property<string>("Comments")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("ContentQuality")
                         .HasColumnType("int");
@@ -357,15 +356,6 @@ namespace Event_Management.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Event_Management.Models.Event", b =>
-                {
-                    b.HasOne("Event_Management.Models.Category", null)
-                        .WithMany("Events")
-                        .HasForeignKey("CategoryID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Event_Management.Models.Feedback", b =>
                 {
                     b.HasOne("Event_Management.Models.Event", "Event")
@@ -416,11 +406,6 @@ namespace Event_Management.Migrations
                         .IsRequired();
 
                     b.Navigation("Feedback");
-                });
-
-            modelBuilder.Entity("Event_Management.Models.Category", b =>
-                {
-                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }

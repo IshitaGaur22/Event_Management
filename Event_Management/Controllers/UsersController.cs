@@ -1,6 +1,7 @@
 ﻿using Event_Management.DTOs;
 using Event_Management.Models;
 using Event_Management.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Authentication;
@@ -33,7 +34,6 @@ namespace Event_Management.Controllers
         }
 
 
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
@@ -49,6 +49,7 @@ namespace Event_Management.Controllers
                 return Unauthorized(ex.Message);
             }
         }
+        
 
         [HttpPut("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
@@ -101,5 +102,3 @@ namespace Event_Management.Controllers
         }
     }
 }
-
-
