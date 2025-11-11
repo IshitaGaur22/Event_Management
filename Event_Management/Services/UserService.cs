@@ -1,10 +1,12 @@
-﻿using Event_Management.Auth;
+﻿using BCrypt;
+using Event_Management.Auth;
+using Event_Management.Data;
 using Event_Management.DTOs;
 using Event_Management.Models;
 using Event_Management.Repository;
 using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Crypto.Generators;
-using BCrypt;
 using System.Security.Authentication;
 
 namespace Event_Management.Services
@@ -13,11 +15,12 @@ namespace Event_Management.Services
     {
         private readonly IUsersRepository _usersRepository;
         private readonly ITokenService _tokenService;
-
-        public UserService(IUsersRepository usersRepository, ITokenService tokenService)
+        private readonly Event_ManagementContext _context;
+        public UserService(IUsersRepository usersRepository, ITokenService tokenService, Event_ManagementContext context)
         {
             _usersRepository = usersRepository;
             _tokenService = tokenService;
+            _context = context;
         }
 
         public async Task<string> RegisterAsync(RegisterDto dto)
@@ -64,6 +67,21 @@ namespace Event_Management.Services
             var user = await _usersRepository.GetUserByEmailAsync(dto.Email);
             return user != null && BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
         }
+        public async Task<UserDetailsDto> GetUserByIdAsync(int id)
+        {
+            var user = await _context.User.FindAsync(id);
+            if (user == null)
+                return null;
+
+            return new UserDetailsDto
+            {
+                Id = user.UserId,
+                Username = user.UserName,
+                Location = user.Location,
+                PhoneNumber = user.PhoneNumber.ToString(),
+                Role = user.Role
+            };
+        }
 
         public async Task ResetPasswordAsync(ResetPasswordDto dto)
         {
@@ -75,7 +93,34 @@ namespace Event_Management.Services
             await _usersRepository.UpdateUserAsync(user);
         }
 
-        
+        public async Task<UserDetailsDto> UpdateUserAsync(int id, UpdateUserDto dto)
+        {
+            var user = await _context.User.FindAsync(id);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found");
+            }
+
+            if (dto.UserName is not null)
+                user.UserName = dto.UserName;
+
+            if (dto.PhoneNumber.HasValue)
+                user.PhoneNumber = dto.PhoneNumber.Value;
+
+            if (dto.Location is not null)
+                user.Location = dto.Location;
+
+            await _usersRepository.UpdateUserAsync(user);
+
+            return new UserDetailsDto
+            {
+                Id = user.UserId,
+                Username = user.UserName,
+                Location = user.Location,
+                PhoneNumber = user.PhoneNumber.ToString(),
+                Role = user.Role
+            };
+        }
 
         public Task<string> RegisterAsync(User user)
         {

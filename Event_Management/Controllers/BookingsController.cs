@@ -1,5 +1,4 @@
-﻿using Event_Management.Data;
-using Event_Management.DTOs;
+﻿using Event_Management.DTOs;
 using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Services;
@@ -14,6 +13,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Event_Management.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Event_Management.Controllers
 {
@@ -24,10 +25,12 @@ namespace Event_Management.Controllers
     {
 
         private readonly IBookingService _bookingService;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public BookingsController(IBookingService bookingService)
+        public BookingsController(IBookingService bookingService, IHubContext<NotificationHub> hubContext)
         {
             _bookingService = bookingService;
+            _hubContext = hubContext;
         }
 
         //Post
@@ -60,6 +63,7 @@ namespace Event_Management.Controllers
             try
             {
                 var summary = _bookingService.AddBooking(dto.SelectedSeats, dto.UserId, dto.EventId);
+                _hubContext.Clients.All.SendAsync("ReceiveNotification", $"Booking confirmed on Event ID {dto.EventId}");
                 return Ok(summary);
             }
             catch (Exception ex)

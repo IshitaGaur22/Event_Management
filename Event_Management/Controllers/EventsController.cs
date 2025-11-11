@@ -47,43 +47,44 @@ namespace Event_Management.Controllers
             }
         }
 
-
-
-        [HttpPut("update-event")]
+        [HttpPut("update-event/{id}")] // <-- Route updated to accept ID as route parameter
         public IActionResult UpdateEvent(
-        [FromQuery] int id,
-        [FromQuery] string? name,
-        [FromQuery] string? description,
-        [FromQuery] string? location,
-        [FromQuery] int TotalSeats,
-        [FromQuery] decimal PricePerTicket,
-        [FromQuery] DateOnly? date,
-        [FromQuery] TimeOnly? time,
-
-        [FromQuery] TimeOnly? endTime
+            [FromRoute] int id, // <-- Get ID from route
+            [FromBody] Event updateData // <-- Get data from JSON body, binding to Event model
         )
         {
-
-            //if (name == null && description == null && date == null && time == null && location == null)
-            //    return BadRequest("No fields provided to update.");
-
-            if (string.IsNullOrWhiteSpace(name) &&
-    string.IsNullOrWhiteSpace(description) &&
-    string.IsNullOrWhiteSpace(location) &&
-    TotalSeats <= 0 &&
-    PricePerTicket <= 0 &&
-    date == null &&
-    time == null &&
-    endTime == null)
+            if (updateData == null)
             {
-                return BadRequest("No fields provided to update.");
+                return BadRequest("No event data provided for update.");
             }
-
+            // Your model validation attributes (e.g., [Required], FutureOrTodayDate)
+            // will automatically be checked by the [ApiController] attribute.
+            if (!ModelState.IsValid)
+            {
+                // You might return validation errors if needed, but for an update, 
+                // we rely heavily on the service/repo logic to handle partial updates.
+            }
 
             try
             {
-                service.UpdateEvent(id, name, description, location, TotalSeats, PricePerTicket, date, time, endTime);
+                // Map the full model data to the service layer's parameter list
+                service.UpdateEvent(
+                    id,
+                    updateData.EventName,
+                    updateData.Description,
+                    updateData.Location,
+                    updateData.TotalSeats,
+                    updateData.PricePerTicket,
+                    updateData.EventDate,
+                    updateData.EventTime,
+                    updateData.EndTime,
+                    updateData.ImagePath
+                );
                 return Ok("Event updated successfully.");
+            }
+            catch (EventAlreadyExistsException ex)
+            {
+                return BadRequest(new { error = ex.Message });
             }
             catch (EventUpdateException ex)
             {

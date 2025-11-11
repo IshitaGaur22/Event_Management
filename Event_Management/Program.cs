@@ -1,17 +1,18 @@
-﻿using System.Security.Claims;
+﻿using Event_Management.Auth;
+using Event_Management.Auth;
 using Event_Management.Data;
 using Event_Management.ExceptionHandlers;
 using Event_Management.Exceptions;
+using Event_Management.Hubs;
 using Event_Management.Repository;
 using Event_Management.Services;
-using Event_Management.Auth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
-using Event_Management.Auth;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,8 +26,10 @@ builder.Services.AddCors(options=>
 {
     options.AddPolicy("MyCorsPolicy", builder =>
     {
-        builder.WithOrigins("http://localhost:3000").AllowAnyMethod()
+        builder.WithOrigins("http://localhost:3000")
+        .AllowAnyMethod()
         .AllowAnyHeader();
+        
     });
 });
 
@@ -37,9 +40,6 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    // --- THIS IS THE CRITICAL FIX ---
-    // You were missing this entire section.
-    // This tells the API how to validate the token.
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -50,9 +50,21 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-        RoleClaimType = ClaimTypes.Role // This tells .NET to read the "role" claim
+        RoleClaimType = ClaimTypes.Role 
     };
-    // ----------------------------------
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"].FirstOrDefault();
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/notificationHub"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 
@@ -62,8 +74,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<Event_ManagementContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Event_ManagementContext")));
 
+builder.Services.AddSignalR();
+
 builder.Services.AddScoped<IEventRepository, EventRepository>();
-//to register the EventRepository class as the implementation of the IEventRepository interface in the dependency injection container.
 builder.Services.AddScoped<IEventService, EventService>();
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -90,8 +103,7 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddScoped<IEmailService, EmailService>();
-//why not add transient?
-//because we want to maintain a single instance of the email service throughout the request lifecycle.
+//addScoped we want to maintain a single instance of the email service throughout the request lifecycle.
 
 
 var app = builder.Build();//Builds the WebApplication instance using the configured services and middleware.
@@ -109,11 +121,11 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();//to redirect HTTP requests to HTTPS.
 app.UseAuthentication();
 
-app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();//to map controller routes to the corresponding controller actions.
+
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("MyCorsPolicy");
