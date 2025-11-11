@@ -3,7 +3,7 @@
     public class UpdateUserDto
     {
         public string? UserName { get; set; }
-        public long? PhoneNumber { get; set; } // made nullable to detect omitted value
+        public long? PhoneNumber { get; set; }
         public string? Location { get; set; }
     }
 }

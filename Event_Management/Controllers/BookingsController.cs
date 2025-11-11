@@ -1,5 +1,4 @@
-﻿using Event_Management.Data;
-using Event_Management.DTOs;
+﻿using Event_Management.DTOs;
 using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Services;
@@ -47,11 +46,7 @@ namespace Event_Management.Controllers
             try
             {
                 var summary = _bookingService.AddBooking(dto.SelectedSeats, dto.UserId, dto.EventId);
-                //var summary = _bookingService.AddBooking(selectedSeats, userName, eventId);
-
-                // ✅ Send real-time notification
-                _hubContext.Clients.All.SendAsync("ReceiveNotification", $"Booking confirmed for {dto.UserName} on Event ID {dto.EventId}");
-
+                _hubContext.Clients.All.SendAsync("ReceiveNotification", $"Booking confirmed on Event ID {dto.EventId}");
                 return Ok(summary);
             }
             catch (Exception ex)

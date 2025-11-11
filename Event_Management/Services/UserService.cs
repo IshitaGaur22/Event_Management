@@ -68,6 +68,21 @@ namespace Event_Management.Services
             var user = await _usersRepository.GetUserByEmailAsync(dto.Email);
             return user != null && BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash);
         }
+        public async Task<UserDetailsDto> GetUserByIdAsync(int id)
+        {
+            var user = await _context.User.FindAsync(id);
+            if (user == null)
+                return null;
+
+            return new UserDetailsDto
+            {
+                Id = user.UserId,
+                Username = user.UserName,
+                Location = user.Location,
+                PhoneNumber = user.PhoneNumber.ToString(),
+                Role = user.Role
+            };
+        }
 
         public async Task ResetPasswordAsync(ResetPasswordDto dto)
         {
@@ -84,22 +99,6 @@ namespace Event_Management.Services
         public Task<string> RegisterAsync(User user)
         {
             throw new NotImplementedException();
-        }
-
-        public async Task<UserDetailsDto> GetUserByIdAsync(int id)
-        {
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
-                return null;
-
-            return new UserDetailsDto
-            {
-                Id = user.UserId,
-                Username = user.UserName,
-                Location = user.Location,
-                PhoneNumber = user.PhoneNumber.ToString(),
-                Role = user.Role
-            };
         }
 
         public async Task<UserDetailsDto> UpdateUserAsync(int id, UpdateUserDto dto)

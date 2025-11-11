@@ -136,6 +136,7 @@ namespace Event_Management.Repository
             return context.SaveChanges();
         }
 
+
         public Event GetEventByName(string eventName) =>
     context.Event.SingleOrDefault(e =>
         e.EventName == eventName);
