@@ -31,26 +31,7 @@ namespace Event_Management.Controllers
         }
 
         //Post
-        //[Authorize]
-        //[HttpPost]
-        //public IActionResult BookTickets([FromQuery] int selectedSeats, [FromQuery] int eventId)
-        //{
-        //    if (selectedSeats <= 0 ||  eventId <= 0)
-        //        return BadRequest("Selected seats, and event ID are required.");
-
-        //    try
-        //    {
-        //        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //        if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized("User Id not found in token");
-        //        int userId = int.Parse(userIdClaim);
-        //        var summary = _bookingService.AddBooking(selectedSeats, userId, eventId);
-        //        return Ok(summary);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
+        
         [HttpPost]
         public IActionResult BookTickets([FromBody] BookingRequestDto dto)
         {
@@ -67,19 +48,6 @@ namespace Event_Management.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //[HttpPost("SubmitFeedback")]
-        //public ActionResult SubmitFeedback([FromBody] CreateFeedbackDto feedback)
-        //{
-        //    try
-        //    {
-        //        return Ok(_service.SubmitFeedback(feedback));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return BadRequest(e.Message);
-        //    }
-
-        //}
 
         //Get
 
