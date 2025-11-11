@@ -24,8 +24,4 @@ public class NotificationController : ControllerBase
         var result = await _notificationService.GetUserNotifications(userId);
         return Ok(result);
     }
-
-
-   
-
 }

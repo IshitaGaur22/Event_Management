@@ -12,7 +12,7 @@ namespace Event_Management.Repository
         decimal GetTotalRevenue();
         public List<EventRevenueDto> GetEventRevenueSummary();
         int GetTotalNoOfUsers();
-        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime, string ImagePath);
+        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime, string? imagePath);
         public int GetEvent(string eventName);
         public Event GetEventbyId(int ticketId);
         public List<Event> GetEventByLocation(string location);

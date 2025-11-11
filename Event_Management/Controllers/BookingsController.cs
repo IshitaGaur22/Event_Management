@@ -1,5 +1,4 @@
-﻿using Event_Management.Data;
-using Event_Management.DTOs;
+﻿using Event_Management.DTOs;
 using Event_Management.Exceptions;
 using Event_Management.Models;
 using Event_Management.Services;
@@ -37,26 +36,7 @@ namespace Event_Management.Controllers
         }
 
         //Post
-        //[Authorize]
-        //[HttpPost]
-        //public IActionResult BookTickets([FromQuery] int selectedSeats, [FromQuery] int eventId)
-        //{
-        //    if (selectedSeats <= 0 ||  eventId <= 0)
-        //        return BadRequest("Selected seats, and event ID are required.");
-
-        //    try
-        //    {
-        //        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //        if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized("User Id not found in token");
-        //        int userId = int.Parse(userIdClaim);
-        //        var summary = _bookingService.AddBooking(selectedSeats, userId, eventId);
-        //        return Ok(summary);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
+        
         [HttpPost]
         public IActionResult BookTickets([FromBody] BookingRequestDto dto)
         {
@@ -66,11 +46,7 @@ namespace Event_Management.Controllers
             try
             {
                 var summary = _bookingService.AddBooking(dto.SelectedSeats, dto.UserId, dto.EventId);
-                //var summary = _bookingService.AddBooking(selectedSeats, userName, eventId);
-
-                // ✅ Send real-time notification
-                _hubContext.Clients.All.SendAsync("ReceiveNotification", $"Booking confirmed for {dto.UserName} on Event ID {dto.EventId}");
-
+                _hubContext.Clients.All.SendAsync("ReceiveNotification", $"Booking confirmed on Event ID {dto.EventId}");
                 return Ok(summary);
             }
             catch (Exception ex)
@@ -78,19 +54,6 @@ namespace Event_Management.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //[HttpPost("SubmitFeedback")]
-        //public ActionResult SubmitFeedback([FromBody] CreateFeedbackDto feedback)
-        //{
-        //    try
-        //    {
-        //        return Ok(_service.SubmitFeedback(feedback));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return BadRequest(e.Message);
-        //    }
-
-        //}
 
         //Get
 

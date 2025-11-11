@@ -9,8 +9,8 @@ namespace Event_Management.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [ExceptionHandler]
-    public class EventsController : ControllerBase
+    [ExceptionHandler] // to handle exceptions globally for this controller
+    public class EventsController : ControllerBase //features required to run a dotnet application
     {
         private readonly IEventService service;
 
@@ -46,7 +46,6 @@ namespace Event_Management.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-
 
         [HttpPut("update-event/{id}")] // <-- Route updated to accept ID as route parameter
         public IActionResult UpdateEvent(
@@ -126,9 +125,9 @@ namespace Event_Management.Controllers
                 var totalBookings = service.GetTotalBookings();
                 return Ok(totalBookings);
             }
-            catch (BookingNotFoundException ex)
+            catch(BookingNotFoundException ex)
             {
-                return NotFound(new { error = ex.Message });
+                return NotFound(new { error = ex.Message});
             }
         }
         [HttpGet("Total Revenue Generated")]
@@ -138,7 +137,7 @@ namespace Event_Management.Controllers
             try
             {
                 var totalRevenue = service.GetTotalRevenue();
-                return Ok(totalRevenue);
+            return Ok(totalRevenue);
             }
             catch (BookingNotFoundException ex)
             {
@@ -159,7 +158,7 @@ namespace Event_Management.Controllers
             //    return NotFound(new { error = ex.Message });
             //}
         }
-
+        
 
 
         [HttpGet]
@@ -180,6 +179,7 @@ namespace Event_Management.Controllers
                 return NotFound(new { error = ex.Message });
             }
         }
+
 
 
 

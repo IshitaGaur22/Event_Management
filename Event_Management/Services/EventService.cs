@@ -74,14 +74,19 @@ namespace Event_Management.Services
             return repository.GetTotalNoOfUsers();
         }
 
-        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime, string ImagePath)
+
+        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime, string? imagePath)
         {
             try
             {
-                var result = repository.UpdateEvent(id, name, description, location, TotalSeats, PricePerTicket, date, time, endTime, ImagePath);
+                var result = repository.UpdateEvent(id, name, description, location, TotalSeats, PricePerTicket, date, time, endTime, imagePath);
                 if (result == 0)
                     throw new EventUpdateException($"Event with ID {id} not found.");
                 return result;
+            }
+            catch (EventAlreadyExistsException) // <-- CATCH SPECIFIC ERROR
+            {
+                throw; // <-- RE-THROW IT TO THE CONTROLLER
             }
             catch (EventUpdateException)
             {
@@ -89,6 +94,7 @@ namespace Event_Management.Services
             }
             catch (Exception)
             {
+                // This catch block executes only for other unexpected errors.
                 throw new EventUpdateException($"An error occurred while updating event ID {id}.");
             }
         }

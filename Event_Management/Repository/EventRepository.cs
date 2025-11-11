@@ -95,14 +95,18 @@ namespace Event_Management.Repository
         }
 
 
-        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime, string ImagePath)
+        public int UpdateEvent(int id, string? name, string? description, string? location, int TotalSeats, decimal PricePerTicket, DateOnly? date, TimeOnly? time, TimeOnly? endTime, string? imagePath)
         {
             var evt = context.Event.FirstOrDefault(e => e.EventID == id);
             if (evt == null)
                 return 0;
 
             if (!string.IsNullOrWhiteSpace(name))
-                evt.EventName = name;
+                // FIX: Only throw exception if the name exists on a DIFFERENT event ID
+                if (context.Event.Any(e => e.EventName == name && e.EventID != id))
+                    throw new EventAlreadyExistsException(name);
+                else
+                    evt.EventName = name;
 
             if (!string.IsNullOrWhiteSpace(description))
                 evt.Description = description;
@@ -124,10 +128,14 @@ namespace Event_Management.Repository
             if (PricePerTicket > 0)
                 evt.PricePerTicket = PricePerTicket;
 
+            if (!string.IsNullOrWhiteSpace(imagePath))
+                evt.ImagePath = imagePath;
+
 
             context.Event.Update(evt);
             return context.SaveChanges();
         }
+
 
         public Event GetEventByName(string eventName) =>
     context.Event.SingleOrDefault(e =>

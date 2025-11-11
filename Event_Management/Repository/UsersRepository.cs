@@ -1,4 +1,5 @@
 ﻿using Event_Management.Data;
+using Event_Management.DTOs;
 using Event_Management.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -49,6 +50,21 @@ namespace Event_Management.Repository
             await _context.SaveChangesAsync();
         }
 
+        public async Task<UserDetailsDto> GetUserByIdAsync(int id)
+        {
+            var user = await _context.User.FindAsync(id);
+            if (user == null)
+                return null;
+
+            return new UserDetailsDto
+            {
+                Id = user.UserId,
+                Username = user.UserName,
+                Location = user.Location,
+                PhoneNumber = user.PhoneNumber.ToString(),
+                Role = user.Role
+            };
+        }
 
     }
 }

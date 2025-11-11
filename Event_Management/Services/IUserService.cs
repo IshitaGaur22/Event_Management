@@ -10,7 +10,7 @@ namespace Event_Management.Services
         Task<LoginResponse> LoginAsync(LoginDto dto);
         Task<bool> ValidateLoginAsync(LoginDto dto);
         Task ResetPasswordAsync(ResetPasswordDto dto);
-
-       
+        Task<UserDetailsDto> GetUserByIdAsync(int id);
+        Task<UserDetailsDto> UpdateUserAsync(int id, UpdateUserDto dto);
     }
 }
