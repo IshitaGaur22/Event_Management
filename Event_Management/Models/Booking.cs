@@ -33,6 +33,7 @@ namespace Event_Management.Models
         [Required(ErrorMessage = "Status is required.")]
         [StringLength(50, ErrorMessage = "Status cannot exceed 50 characters.")]
         public string Status { get; set; } = "Upcoming"; 
+        //public string Description { get; set; }
 
         public virtual Event Event { get; set; }
         public virtual User User { get; set; }

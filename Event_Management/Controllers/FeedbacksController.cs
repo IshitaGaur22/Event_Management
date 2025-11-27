@@ -4,6 +4,7 @@ using Event_Management.Models;
 using Event_Management.Services;
 using EventFeedback.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace Event_Management.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyCorsPolicy")]
     public class FeedbacksController : ControllerBase
     {
         private readonly IFeedbackService _service;
