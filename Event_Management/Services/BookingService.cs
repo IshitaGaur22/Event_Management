@@ -40,8 +40,6 @@ namespace Event_Management.Services
 
             var user = _bookingRepository.GetUserById(userId);
 
-
-            //Post
             // Create Booking
             var booking = new Booking
             {
@@ -69,7 +67,6 @@ namespace Event_Management.Services
             };
             _paymentRepository.AddPayment(payment);
 
-            // Send Confirmation Email
             //  Send Confirmation Email
             var subject = "Booking Confirmation";
 

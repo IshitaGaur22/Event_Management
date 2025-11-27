@@ -7,30 +7,24 @@ using System.Text;
 namespace Event_Management.Auth
 {
     public class TokenService : ITokenService
-
     {
 
         private readonly IConfiguration _config;
 
         public TokenService(IConfiguration config)
-
         {
-
             _config = config;
-
         }
 
         public string CreateToken(User us)
-
         {
 
-            var claims = new[]
-{
-    new Claim(ClaimTypes.NameIdentifier, us.UserId.ToString()),
-    new Claim(ClaimTypes.Name, us.UserName),
-    new Claim(ClaimTypes.Email, us.Email),
-    new Claim(ClaimTypes.Role, us.Role)
-};
+            var claims = new[]{
+                new Claim(ClaimTypes.NameIdentifier, us.UserId.ToString()),
+                new Claim(ClaimTypes.Name, us.UserName),
+                new Claim(ClaimTypes.Email, us.Email),
+                new Claim(ClaimTypes.Role, us.Role)
+            };
 
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -47,7 +41,8 @@ namespace Event_Management.Auth
 
                 expires: DateTime.Now.AddHours(2),
 
-                signingCredentials: creds);
+                signingCredentials: creds
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
 
